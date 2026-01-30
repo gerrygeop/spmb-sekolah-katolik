@@ -29,7 +29,6 @@ class RegistrationsTable
 
                 TextColumn::make('school_level')
                     ->label('Jenjang Pendidikan')
-                    ->formatStateUsing(fn(string $state): string => str()->upper($state))
                     ->sortable(),
 
                 TextColumn::make('status')
