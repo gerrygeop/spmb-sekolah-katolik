@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Document extends Model
 {
-    /** @use HasFactory<\Database\Factories\DocumentFactory> */
     protected $fillable = [
         'name',
         'description',

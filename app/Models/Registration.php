@@ -29,7 +29,7 @@ class Registration extends Model
         return $this->hasOne(StudentProfile::class);
     }
 
-    public function parentProfile()
+    public function parent()
     {
         return $this->hasOne(ParentProfile::class);
     }
