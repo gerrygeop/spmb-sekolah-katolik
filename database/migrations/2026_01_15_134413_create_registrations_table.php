@@ -13,8 +13,7 @@ return new class extends Migration {
         Schema::create('registrations', function (Blueprint $table) {
             $table->id();
             $table->string('registration_code')->unique();
-            $table->enum('school_level', ['sd', 'smp', 'sma']);
-
+            $table->string('school_level');
             $table->string('status')->nullable();
             $table->text('notes')->nullable();
             $table->decimal('total_amount', 12, 2)->default(0);

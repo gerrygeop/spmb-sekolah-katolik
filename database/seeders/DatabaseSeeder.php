@@ -15,11 +15,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
         User::factory()->create([
             'name' => 'Admin User',
             'email' => 'admin@example.com',
+            'role' => \App\Enums\UserRole::ADMIN->value,
         ]);
     }
 }

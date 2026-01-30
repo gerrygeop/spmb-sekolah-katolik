@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('documents', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('registration_id')->constrained('registrations')->onDelete('cascade');
-            $table->string('type');
-            $table->string('file_path');
+            $table->string('name');
+            $table->string('description')->nullable();
+            $table->boolean('is_required')->default(false);
             $table->timestamps();
         });
     }

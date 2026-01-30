@@ -10,10 +10,7 @@ class Payment extends Model
     /** @use HasFactory<\Database\Factories\PaymentFactory> */
     protected $fillable = [
         'registration_id',
-        'amount',
-        'status',
-        'snap_token',
-        'order_id',
+        'proof_file',
     ];
 
     public function registration()

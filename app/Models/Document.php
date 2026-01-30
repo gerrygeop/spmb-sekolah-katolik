@@ -4,18 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Document extends Model
 {
     /** @use HasFactory<\Database\Factories\DocumentFactory> */
     protected $fillable = [
-        'registration_id',
-        'type',
-        'file_path',
+        'name',
+        'description',
+        'is_required',
     ];
 
-    public function registration()
+    public function registrations(): HasMany
     {
-        return $this->belongsTo(Registration::class);
+        return $this->hasMany(RegistrationDocument::class);
     }
 }

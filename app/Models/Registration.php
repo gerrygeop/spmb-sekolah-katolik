@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Registration extends Model
 {
@@ -19,6 +20,7 @@ class Registration extends Model
     ];
 
     protected $casts = [
+        'school_level' => \App\Enums\SchooleLevel::class,
         'status' => \App\Enums\RegistrationStatus::class,
     ];
 
@@ -34,11 +36,16 @@ class Registration extends Model
 
     public function documents()
     {
-        return $this->hasMany(Document::class);
+        return $this->hasMany(RegistrationDocument::class);
     }
 
     public function payment()
     {
         return $this->hasOne(Payment::class);
+    }
+
+    public function logs(): HasMany
+    {
+        return $this->hasMany(RegistrationLog::class);
     }
 }
