@@ -1,5 +1,5 @@
 <x-layouts.landing>
-	<div class="bg-slate-50 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+	<div class="bg-slate-50 min-h-screen py-12 px-2 sm:px-6 lg:px-8">
 		<div class="max-w-7xl mx-auto space-y-6">
 
 			{{-- Flash Messages --}}
@@ -30,87 +30,411 @@
 							</h5>
 						</div>
 						<div class="text-left md:text-right">
-							<div class="text-xs text-slate-400 uppercase tracking-wider">Kode Pendaftaran</div>
-							<div class="text-2xl font-mono font-bold text-yellow-400">
-								{{ $registration->registration_code }}</div>
+							<div class="text-xs text-slate-400 uppercase tracking-wider mb-2">Kode Pendaftaran</div>
+							<div class="text-2xl text-yellow-400 font-mono font-bold flex items-center justify-end gap-3">
+								<span>{{ $registration->registration_code }}</span>
+								<button onclick="copyToClipboard('{{ $registration->registration_code }}')" title="Salin"
+									class="transition-colors text-yellow-500 hover:text-yellow-400 p-1 hover:bg-slate-600 rounded-lg">
+									<svg xmlns="http://www.w3.org/2000/svg" class="size-6" fill="none" viewBox="0 0 24 24"
+										stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+											d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+									</svg>
+								</button>
+							</div>
+							<p class="text-sm text-slate-300 tracking-wide mt-2">
+								Harap simpan kode pendaftaran ini untuk digunakan saat proses pendaftaran.
+							</p>
 						</div>
 					</div>
 				</div>
 
 				{{-- Status Section --}}
-				<div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+				<div class="px-6 py-4 bg-slate-50/50">
 					<div class="flex items-center gap-3">
-						<span class="text-2xl">{{ $registration->status->statusIcon() }}</span>
-						<div>
-							<span class="text-xs text-slate-500 uppercase tracking-wider">Status</span>
-							<div
-								class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold {{ $registration->status->statusColor() }} border">
-								{{ $registration->status->getLabel() }}
-							</div>
+						<span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Status</span>
+						<div
+							class="inline-flex items-center px-3 py-1 rounded-full text-sm uppercase font-semibold {{ $registration->status->statusColor() }} border">
+							{{ $registration->status->getLabel() }}
 						</div>
 					</div>
 				</div>
 
-				{{-- Payment Section --}}
+				{{-- Pembayaran Tertunda --}}
 				@if ($registration->status === \App\Enums\RegistrationStatus::PEMBAYARAN_TERTUNDA)
-					<div class="px-6 py-6 bg-yellow-50 border-t border-yellow-500">
-						<div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-							<div>
-								<h3 class="font-bold text-yellow-900">Tagihan Pembayaran Pendaftaran</h3>
-								<p class="text-3xl font-bold text-yellow-800 mt-1">Rp
-									{{ number_format($registration->total_amount, 0, ',', '.') }}</p>
-								<p class="text-sm text-yellow-700 mt-2">Selesaikan pembayaran untuk melanjutkan proses
-									pendaftaran.</p>
+					<div class="bg-amber-50 rounded-t-3xl border-t border-amber-200 overflow-hidden shadow-sm">
+						<div class="p-8 md:p-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+							<div class="space-y-4 max-w-lg">
+								<div>
+									<h3 class="text-amber-900 font-black text-xl flex items-center gap-2 uppercase tracking-tight">
+										Tagihan Pendaftaran
+									</h3>
+									<p class="text-amber-700/80 text-sm leading-relaxed mt-1">
+										Segera lakukan transfer untuk mengamankan slot pendaftaran Anda.
+									</p>
+								</div>
+								<div class="flex flex-col">
+									<span class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1">Total Biaya</span>
+									<span class="text-4xl font-black text-amber-800 tracking-tighter leading-none">
+										Rp {{ number_format($registration->total_amount, 0, ',', '.') }}
+									</span>
+								</div>
 							</div>
 
-							<button id="pay-button"
-								class="w-full md:w-auto px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-lg hover:shadow-xl flex items-center justify-center gap-2">
-								<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-										d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-								</svg>
-								Bayar Sekarang
-							</button>
+							<div
+								class="space-y-4 w-full md:w-auto border-t md:border-t-0 md:border-l border-amber-200 pt-6 md:pt-0 md:pl-10">
+								<div class="flex items-center gap-4">
+									<span class="text-xs font-black text-amber-900 uppercase">Bank BNI</span>
+								</div>
+								<div>
+									<p class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1">Nomor Rekening</p>
+									<div class="flex items-center gap-3">
+										<span class="text-2xl font-mono font-black text-amber-900">123123123</span>
+										<button onclick="copyToClipboard('123123123')" title="Salin"
+											class="p-2 hover:bg-amber-200 rounded-lg transition-colors text-amber-700 active:scale-90">
+											<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+												stroke="currentColor">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+													d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+											</svg>
+										</button>
+									</div>
+									<p class="text-xs font-bold text-amber-800/70 mt-1 uppercase">A/n Yayasan Pendidikan Katolik</p>
+								</div>
+							</div>
+						</div>
+
+						{{-- Upload bukti pembayaran --}}
+						<div class="bg-white px-8 pb-6 pt-8 border-t border-slate-200">
+							<form action="{{ route('payments.upload', $registration->id) }}" method="POST" enctype="multipart/form-data"
+								class="flex flex-col md:flex-row items-center gap-4">
+								@csrf
+								<div class="grow w-full">
+									<label class="block text-xs font-black text-slate-700 uppercase tracking-widest mb-2">
+										Unggah Bukti Transfer
+									</label>
+									<input type="file" name="proof_file" required
+										class="block w-full text-xs text-slate-900
+                                    file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0
+                                    file:text-xs file:font-black file:bg-slate-600 file:text-white
+                                    hover:file:bg-slate-700 transition-all cursor-pointer bg-white/50 rounded-xl border border-slate-300 p-2">
+
+									<span class="text-xs capitalize font-normal">(Format file yang diterima: <strong>PDF, JPG, JPEG,
+											PNG</strong>. Maksimal
+										<strong>2MB</strong>)</span>
+								</div>
+								<button type="submit"
+									class="w-full md:w-auto px-10 py-3 bg-slate-800 text-white font-black text-xs uppercase tracking-widest rounded-xl hover:bg-slate-900 shadow-lg shadow-slate-900/20 transition-all active:scale-95">
+									Konfirmasi
+								</button>
+							</form>
 						</div>
 					</div>
 				@endif
 
-				{{-- Payment Verified - Next Steps --}}
-				@if ($registration->status === \App\Enums\RegistrationStatus::PEMBAYARAN_TERVERIFIKASI)
-					<div class="px-6 py-6 bg-blue-50 border-b border-blue-100">
-						<h3 class="font-bold text-blue-900 mb-3">✅ Pembayaran Berhasil!</h3>
-						<p class="text-sm text-blue-800 mb-4">Data Anda sedang dalam proses verifikasi oleh Admin.</p>
-						<div class="bg-white rounded-xl p-4 border border-blue-200">
-							<h4 class="font-semibold text-slate-900 mb-2">📅 Jadwal Tes Seleksi</h4>
-							<div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-								<div><span class="text-slate-500">Tanggal:</span> <strong>20 Januari 2026</strong></div>
-								<div><span class="text-slate-500">Waktu:</span> <strong>08:00 - 12:00 WIB</strong></div>
-								<div><span class="text-slate-500">Lokasi:</span> <strong>Gedung Aula Utama</strong></div>
-								<div><span class="text-slate-500">Bawa:</span> <strong>Kartu Identitas, Alat Tulis</strong>
+				{{-- Sedang Diverifikasi --}}
+				@if ($registration->status === \App\Enums\RegistrationStatus::VERIFIKASI)
+					<div class="bg-blue-50 border-t border-blue-200 rounded-t-3xl overflow-hidden shadow-sm animate-fade-in">
+						<div class="p-8 md:p-10">
+							<div class="flex flex-col md:flex-row items-center gap-8">
+								<div class="relative shrink-0">
+									<div class="bg-blue-600 text-white p-5 rounded-2xl shadow-xl shadow-blue-200 relative z-10">
+										<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+											stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-10">
+											<path
+												d="M16 22h2a2 2 0 0 0 2-2V8a2.4 2.4 0 0 0-.706-1.706l-3.588-3.588A2.4 2.4 0 0 0 14 2H6a2 2 0 0 0-2 2v2.85" />
+											<path d="M14 2v5a1 1 0 0 0 1 1h5" />
+											<path d="M8 14v2.2l1.6 1" />
+											<circle cx="8" cy="16" r="6" />
+										</svg>
+									</div>
+								</div>
+
+								<div class="grow space-y-3 text-center md:text-left">
+									<div class="flex flex-col md:flex-row md:items-center gap-3">
+										<h3 class="text-xl md:text-2xl font-black text-blue-900 uppercase tracking-tight">
+											Sedang Diverifikasi
+										</h3>
+									</div>
+									<p class="text-sm font-bold text-blue-800/80 leading-relaxed max-w-2xl">
+										Dokumen dan/atau bukti pembayaran yang Anda kirimkan sedang kami tinjau.
+										Mohon menunggu sebentar, pembaruan status akan kami informasikan setelah proses verifikasi selesai.
+									</p>
+								</div>
+
+								{{-- Badge Status --}}
+								<div class="w-full md:w-auto flex flex-col items-center gap-2">
+									<div class="px-6 py-4 bg-white/60 rounded-2xl border border-blue-100 flex items-center gap-3 shadow-sm">
+										<div class="w-3 h-3 bg-blue-500 rounded-full animate-pulse"></div>
+										<span class="text-xs font-black text-blue-900 uppercase tracking-widest">Dalam peninjauan</span>
+									</div>
+									<p class="text-[10px] font-bold text-blue-400 italic">Terima kasih atas kesabaran Anda.</p>
 								</div>
 							</div>
 						</div>
 					</div>
 				@endif
 
-				{{-- Need Revision --}}
-				@if ($registration->status->value === \App\Enums\RegistrationStatus::PERBAIKAN->value)
-					<div class="px-6 py-6 bg-orange-50 border-b border-orange-100">
-						<h3 class="font-bold text-orange-900 mb-2">⚠️ Perlu Perbaikan Data</h3>
-						<p class="text-sm text-orange-800 mb-3">{{ $registration->notes }}</p>
-						<a href="{{ route('registration.edit', ['code' => $registration->registration_code]) }}"
-							class="inline-flex items-center px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-semibold rounded-lg transition-colors">
-							Edit Formulir →
-						</a>
+				{{-- Terverifikasi --}}
+				@if ($registration->status === \App\Enums\RegistrationStatus::TERVERIFIKASI)
+					<div class="bg-indigo-50 border-t border-indigo-100 rounded-t-3xl overflow-hidden shadow-sm animate-fade-in">
+						<div class="p-8">
+							<div class="flex items-center gap-4 mb-6">
+								<div class="bg-emerald-500 text-white p-2 rounded-full shadow-lg shadow-emerald-200">
+									<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+										stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+									</svg>
+								</div>
+								<div>
+									<h3 class="text-xl font-black text-indigo-950 tracking-tight leading-none">Data Terverifikasi</h3>
+									<p class="text-sm text-indigo-700/80 mt-1 font-medium">Data Anda telah diverifikasi. Berikut adalah detail
+										jadwal seleksi Anda:</p>
+								</div>
+							</div>
+
+							<div class="bg-white rounded-2xl p-6 border border-indigo-200 shadow-sm relative overflow-hidden">
+								<h4 class="text-[10px] font-black text-indigo-500 uppercase tracking-[0.2em] mb-4 flex items-center gap-2">
+									<span class="w-2 h-2 bg-indigo-500 rounded-full animate-pulse"></span>
+									Jadwal Tes Seleksi
+								</h4>
+
+								<div class="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-8 relative z-10">
+									{{-- Tanggal --}}
+									<div class="flex items-start gap-3">
+										<div class="p-2 bg-indigo-50 rounded-lg text-indigo-600">
+											<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+												stroke="currentColor">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+													d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+											</svg>
+										</div>
+										<div>
+											<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Tanggal</p>
+											<p class="font-black text-slate-800">20 Januari 2026</p>
+										</div>
+									</div>
+
+									{{-- Waktu --}}
+									<div class="flex items-start gap-3">
+										<div class="p-2 bg-indigo-50 rounded-lg text-indigo-600">
+											<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+												stroke="currentColor">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+													d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+											</svg>
+										</div>
+										<div>
+											<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Waktu</p>
+											<p class="font-black text-slate-800">08:00 - 12:00 WIB</p>
+										</div>
+									</div>
+
+									{{-- Lokasi --}}
+									<div class="flex items-start gap-3">
+										<div class="p-2 bg-indigo-50 rounded-lg text-indigo-600">
+											<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+												stroke="currentColor">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+													d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+													d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+											</svg>
+										</div>
+										<div>
+											<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Lokasi</p>
+											<p class="font-black text-slate-800 uppercase tracking-tight">Gedung Aula Utama</p>
+										</div>
+									</div>
+
+									<div class="flex items-start gap-3">
+										<div class="p-2 bg-indigo-50 rounded-lg text-indigo-600">
+											<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+												stroke="currentColor">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+													d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+											</svg>
+										</div>
+										<div>
+											<p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Wajib Bawa</p>
+											<p class="font-black text-slate-800">Kartu Identitas, Alat Tulis</p>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<div class="mt-6 flex items-center justify-between">
+								<p class="text-[11px] text-indigo-500 font-bold italic">*Harap datang 15 menit sebelum tes dimulai.</p>
+							</div>
+						</div>
 					</div>
 				@endif
 
-				{{-- Approved --}}
-				@if ($registration->status === \App\Enums\RegistrationStatus::DITERIMA)
-					<div class="px-6 py-6 bg-green-50 border-b border-green-100">
-						<h3 class="font-bold text-green-900 mb-2">🎉 Selamat! Anda Diterima</h3>
-						<p class="text-sm text-green-800">Silakan datang ke sekolah untuk proses daftar ulang dengan membawa
-							dokumen asli.</p>
+				{{-- Perlu Perbaikan --}}
+				@if ($registration->status === \App\Enums\RegistrationStatus::PERBAIKAN)
+					<div class="bg-red-50 border-t border-red-200 rounded-t-3xl overflow-hidden shadow-sm animate-pulse-subtle">
+						<div class="p-8 flex flex-col md:flex-row items-start md:items-center gap-6">
+							<div class="bg-red-100 text-red-600 p-4 rounded-2xl shadow-inner">
+								<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+									stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+										d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+								</svg>
+							</div>
+
+							<div class="grow space-y-2">
+								<h3 class="text-lg font-black text-red-900 uppercase tracking-tight">Perlu Perbaikan Data</h3>
+								<div class="bg-white/60 rounded-xl p-4 border border-red-100">
+									<p class="text-[10px] font-black text-red-400 uppercase tracking-widest mb-1">Catatan Admin:</p>
+									<p class="font-semibold text-red-800 leading-relaxed">
+										"{{ $registration->notes ?? 'Mohon periksa kembali kelengkapan berkas Anda.' }}"
+									</p>
+								</div>
+							</div>
+
+							<div class="w-full md:w-auto">
+								<a href="{{ route('registration.edit', ['code' => $registration->registration_code]) }}"
+									class="group flex items-center justify-center gap-3 px-8 py-4 bg-red-600 hover:bg-red-700 text-white font-black text-xs uppercase tracking-[0.15em] rounded-2xl transition-all shadow-lg shadow-red-600/20 active:scale-95">
+									Perbaiki Sekarang
+									<svg xmlns="http://www.w3.org/2000/svg"
+										class="h-4 w-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24"
+										stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7-7 7M21 12H3" />
+									</svg>
+								</a>
+							</div>
+						</div>
+					</div>
+				@endif
+
+				{{-- Lulus --}}
+				@if ($registration->status === \App\Enums\RegistrationStatus::LULUS)
+					<div
+						class="bg-emerald-50 border-t border-emerald-200 rounded-t-3xl overflow-hidden shadow-sm relative animate-fade-in">
+						<div class="p-8 md:p-10 text-center md:text-left flex flex-col md:flex-row items-center gap-8">
+							<div class="relative">
+								<div
+									class="w-20 h-20 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-emerald-200 transform -rotate-3">
+									<svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24"
+										stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+											d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+									</svg>
+								</div>
+								<div class="absolute -top-2 -right-2 text-2xl animate-bounce">🎉</div>
+							</div>
+
+							<div class="grow space-y-3">
+								<h3 class="text-2xl md:text-3xl font-black text-emerald-900 tracking-tighter uppercase">
+									Selamat, Anda Lulus!
+								</h3>
+								<p class="text-sm text-emerald-800/80 leading-relaxed max-w-xl">
+									Selamat! Anda dinyatakan Lulus di <span class="font-bold">{{ $registration->school_level->getLabel() }}
+										Sekolah Katolik</span>. Langkah selanjutnya
+									adalah melakukan proses daftar ulang dan melakukan pembayaran.
+								</p>
+
+								{{-- <div class="inline-flex flex-wrap items-center gap-4 pt-2">
+									<div
+										class="flex items-center gap-2 text-[10px] font-black text-emerald-700 bg-white/50 px-3 py-1.5 rounded-full border border-emerald-200 uppercase tracking-widest">
+										<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+											stroke="currentColor">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+												d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+										</svg>
+										Bawa Dokumen Asli
+									</div>
+									<div
+										class="flex items-center gap-2 text-[10px] font-black text-emerald-700 bg-white/50 px-3 py-1.5 rounded-full border border-emerald-200 uppercase tracking-widest">
+										<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+											stroke="currentColor">
+											<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+												d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+										</svg>
+										Jam Kerja (08:00 - 15:00)
+									</div>
+								</div> --}}
+							</div>
+
+							<div
+								class="relative shrink-0 w-full md:w-auto border-t md:border-t-0 md:border-l border-emerald-200 pt-6 md:pt-0 md:pl-10">
+								<button
+									class="w-full md:w-auto px-8 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs uppercase tracking-[0.2em] rounded-2xl shadow-lg shadow-emerald-600/20 transition-all active:scale-95 flex items-center justify-center gap-3">
+									Daftar Ulang
+								</button>
+							</div>
+						</div>
+					</div>
+				@endif
+
+				{{-- Tidak Lulus --}}
+				@if ($registration->status === \App\Enums\RegistrationStatus::TIDAK_LULUS)
+					<div class="bg-red-50 border-t border-red-200 rounded-t-3xl overflow-hidden shadow-sm animate-fade-in">
+						<div class="p-8 md:p-10 text-center md:text-left">
+							<div class="flex flex-col md:flex-row items-center gap-8">
+								<div class="bg-red-200 text-red-500 p-5 rounded-2xl shrink-0 shadow-inner">
+									<svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24"
+										stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+											d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+									</svg>
+								</div>
+
+								<div class="grow space-y-3">
+									<h3 class="text-xl md:text-2xl font-black text-slate-800 uppercase tracking-tight">
+										Informasi Hasil Seleksi
+									</h3>
+									<p class="text-sm font-bold text-slate-600 leading-relaxed max-w-2xl">
+										Terima kasih atas minat dan partisipasi Anda dalam proses seleksi kami. Setelah melalui pertimbangan yang
+										matang, kami menyesal menginformasikan bahwa saat ini Anda <span
+											class="text-slate-900 underline decoration-slate-300 decoration-2 underline-offset-4">belum dapat
+											bergabung</span> bersama kami.
+									</p>
+									<p class="text-sm font-black text-slate-500 uppercase tracking-widest">
+										Tetap semangat dan sukses untuk perjalanan akademik Anda di tempat lain.
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
+				@endif
+
+				{{-- Cadangan --}}
+				@if ($registration->status === \App\Enums\RegistrationStatus::CADANGAN)
+					<div class="bg-amber-50 border-t border-amber-200 rounded-t-3xl overflow-hidden shadow-sm animate-fade-in">
+						<div class="p-8 md:p-10">
+							<div class="flex flex-col md:flex-row items-start md:items-center gap-6">
+								<div class="bg-amber-100 text-amber-600 p-4 rounded-2xl shadow-inner shrink-0">
+									<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+										stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+											d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+									</svg>
+								</div>
+
+								<div class="grow space-y-2">
+									<h3 class="text-xl font-black text-amber-900 uppercase tracking-tight flex items-center gap-3">
+										Anda masuk dalam daftar cadangan
+									</h3>
+									<p class="text-sm font-bold text-amber-800/80 leading-relaxed max-w-2xl">
+										Saat ini, Anda berada dalam daftar cadangan penerimaan siswa baru. Kami akan menghubungi Anda
+										jika ada slot yang tersedia. Terima kasih atas kesabaran dan pengertian Anda.
+									</p>
+								</div>
+							</div>
+
+							<div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-amber-200/50 pt-6">
+								<div class="flex items-center gap-3">
+									<div class="w-1.5 h-1.5 bg-amber-400 rounded-full"></div>
+									<p class="text-[11px] font-bold text-amber-700 uppercase tracking-wider">Update Terakhir:
+										{{ now()->format('d M Y') }}</p>
+								</div>
+								<div class="flex items-center gap-3">
+									<div class="w-1.5 h-1.5 bg-amber-400 rounded-full"></div>
+									<p class="text-[11px] font-bold text-amber-700 uppercase tracking-wider">Periode Tunggu: 7 Hari Kerja</p>
+								</div>
+							</div>
+						</div>
 					</div>
 				@endif
 			</div>
@@ -131,7 +455,7 @@
 							</div>
 							<div>
 								<dt class="text-slate-500">Jenjang</dt>
-								<dd class="font-semibold text-slate-900">{{ strtoupper($registration->school_level) }}
+								<dd class="font-semibold text-slate-900">{{ strtoupper($registration->school_level->value) }}
 								</dd>
 							</div>
 							<div>
@@ -184,18 +508,18 @@
 						<div class="grid grid-cols-2 gap-y-3">
 							<div>
 								<span class="text-slate-500 mb-1">Nama Ayah</span>
-								<p class=" text-slate-900 font-semibold">{{ $registration->parentProfile->father_name ?? '-' }}</p>
+								<p class=" text-slate-900 font-semibold">{{ $registration->parent->father_name ?? '-' }}</p>
 							</div>
 							<div>
 								<span class="text-slate-500 mb-1">Pekerjaan Ayah</span>
 								<p class="text-slate-900 font-semibold">
-									{{ $registration->parentProfile->father_occupation ?? '-' }}
+									{{ $registration->parent->father_occupation ?? '-' }}
 								</p>
 							</div>
 							<div>
 								<span class="text-slate-500 mb-1">No. Telepon Ayah</span>
 								<p class="text-slate-900 font-semibold">
-									{{ $registration->parentProfile->father_phone ?? '-' }}
+									{{ $registration->parent->father_phone ?? '-' }}
 								</p>
 							</div>
 						</div>
@@ -203,27 +527,27 @@
 						<div class="grid grid-cols-2 gap-y-3">
 							<div>
 								<span class="text-slate-500 mb-1">Nama Ibu</span>
-								<p class=" text-slate-900 font-semibold">{{ $registration->parentProfile->mother_name ?? '-' }}</p>
+								<p class=" text-slate-900 font-semibold">{{ $registration->parent->mother_name ?? '-' }}</p>
 							</div>
 							<div>
 								<span class="text-slate-500 mb-1">Pekerjaan Ibu</span>
 								<p class="text-slate-900 font-semibold">
-									{{ $registration->parentProfile->mother_occupation ?? '-' }}
+									{{ $registration->parent->mother_occupation ?? '-' }}
 								</p>
 							</div>
 							<div>
 								<span class="text-slate-500 mb-1">No. Telepon Ibu</span>
 								<p class="text-slate-900 font-semibold">
-									{{ $registration->parentProfile->mother_phone ?? '-' }}
+									{{ $registration->parent->mother_phone ?? '-' }}
 								</p>
 							</div>
 						</div>
-						@if ($registration->parentProfile->guardian_name)
+						@if ($registration->parent->guardian_name)
 							<div>
 								<h4 class="font-semibold text-slate-700 mb-1">Wali</h4>
-								<p class="text-slate-900">{{ $registration->parentProfile->guardian_name }}</p>
-								<p class="text-slate-500">{{ $registration->parentProfile->guardian_occupation ?? '-' }} •
-									{{ $registration->parentProfile->guardian_phone ?? '-' }}</p>
+								<p class="text-slate-900">{{ $registration->parent->guardian_name }}</p>
+								<p class="text-slate-500">{{ $registration->parent->guardian_occupation ?? '-' }} •
+									{{ $registration->parent->guardian_phone ?? '-' }}</p>
 							</div>
 						@endif
 					</div>
@@ -235,48 +559,40 @@
 				{{-- Documents --}}
 				<div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
 					<div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
-						<h3 class="font-bold text-slate-900">📄 Dokumen</h3>
+						<h3 class="font-bold text-slate-900 flex items-center gap-2">
+							📄 Dokumen Pendaftaran
+						</h3>
 					</div>
-					<div class="p-6">
-						@forelse($registration->documents as $doc)
+
+					<div class="p-6 space-y-3">
+						@forelse ($registration->documents as $doc)
 							<div class="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
-								<span class="text-sm text-slate-700 capitalize">{{ str_replace('_', ' ', $doc->type) }}</span>
+								<div>
+									<p class="text-sm font-medium text-slate-800">
+										{{ $doc->document->name }}
+									</p>
+
+									@if ($doc->document->description)
+										<p class="text-xs text-slate-500">
+											{{ $doc->document->description }}
+										</p>
+									@endif
+								</div>
+
 								<a href="{{ Storage::url($doc->file_path) }}" target="_blank"
-									class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Lihat →</a>
+									class="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 text-sm font-semibold">
+									Lihat
+									<svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24"
+										stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7-7 7M21 12H3" />
+									</svg>
+								</a>
 							</div>
 						@empty
-							<p class="text-sm text-slate-500">Belum ada dokumen yang diunggah.</p>
+							<p class="text-sm text-slate-500 italic">
+								Belum ada dokumen yang diunggah.
+							</p>
 						@endforelse
-					</div>
-				</div>
-
-				{{-- Payment Info --}}
-				<div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-					<div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
-						<h3 class="font-bold text-slate-900">💰 Informasi Pembayaran</h3>
-					</div>
-					<div class="p-6 text-sm">
-						@if ($registration->payment)
-							<dl class="space-y-2">
-								<div class="flex justify-between">
-									<dt class="text-slate-500">Order ID</dt>
-									<dd class="font-mono text-slate-900">{{ $registration->payment->order_id ?? '-' }}</dd>
-								</div>
-								<div class="flex justify-between">
-									<dt class="text-slate-500">Jumlah</dt>
-									<dd class="font-semibold text-slate-900">Rp
-										{{ number_format($registration->payment->amount, 0, ',', '.') }}</dd>
-								</div>
-								<div class="flex justify-between">
-									<dt class="text-slate-500">Status</dt>
-									<dd
-										class="font-semibold capitalize {{ $registration->payment->status === 'success' ? 'text-green-600' : 'text-yellow-600' }}">
-										{{ $registration->payment->status }}</dd>
-								</div>
-							</dl>
-						@else
-							<p class="text-slate-500">Belum ada data pembayaran.</p>
-						@endif
 					</div>
 				</div>
 			</div>
@@ -284,81 +600,11 @@
 	</div>
 
 	@push('scripts')
-		<script
-			src="{{ config('services.midtrans.is_production') ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' }}"
-			data-client-key="{{ config('services.midtrans.client_key') }}"></script>
 		<script>
-			const payButton = document.getElementById('pay-button');
-			if (payButton) {
-				payButton.onclick = function() {
-					payButton.disabled = true;
-					payButton.innerHTML =
-						'<svg class="animate-spin h-5 w-5 mr-2" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg> Memproses...';
-
-					fetch('{{ route('payment.snap-token') }}', {
-							method: 'POST',
-							headers: {
-								'Content-Type': 'application/json',
-								'X-CSRF-TOKEN': '{{ csrf_token() }}'
-							},
-							body: JSON.stringify({
-								registration_code: '{{ $registration->registration_code }}'
-							})
-						})
-						.then(res => res.json())
-						.then(data => {
-							payButton.disabled = false;
-							payButton.innerHTML =
-								'<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg> Bayar Sekarang';
-							if (data.snap_token) {
-								snap.pay(data.snap_token, {
-									onSuccess: (result) => {
-										updateStatus(result.transaction_status || 'settlement');
-									},
-									onPending: (result) => {
-										updateStatus('pending');
-									},
-									onError: (result) => {
-										showNotification('error', 'Pembayaran gagal. Silakan coba lagi.');
-									},
-									onClose: () => {
-										console.log('Popup closed');
-									}
-								});
-							} else {
-								showNotification('error', data.error || 'Gagal mendapatkan token pembayaran.');
-							}
-						}).catch(err => {
-							payButton.disabled = false;
-							payButton.innerHTML = 'Bayar Sekarang';
-							showNotification('error', 'Terjadi kesalahan sistem.');
-						});
-				};
-			}
-
-			function updateStatus(transactionStatus) {
-				fetch('{{ route('payment.callback') }}', {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json',
-							'X-CSRF-TOKEN': '{{ csrf_token() }}'
-						},
-						body: JSON.stringify({
-							registration_code: '{{ $registration->registration_code }}',
-							transaction_status: transactionStatus
-						})
-					})
-					.then(() => location.reload())
-					.catch(() => location.reload());
-			}
-
-			function showNotification(type, message) {
-				const div = document.createElement('div');
-				div.className =
-					`fixed top-4 right-4 p-4 rounded-xl shadow-lg z-50 ${type === 'error' ? 'bg-red-500' : 'bg-green-500'} text-white font-medium max-w-md`;
-				div.textContent = message;
-				document.body.appendChild(div);
-				setTimeout(() => div.remove(), 5000);
+			function copyToClipboard(text) {
+				navigator.clipboard.writeText(text).then(() => {
+					alert('Nomor rekening berhasil disalin!');
+				});
 			}
 		</script>
 	@endpush

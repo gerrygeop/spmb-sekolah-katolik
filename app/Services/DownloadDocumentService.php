@@ -86,12 +86,43 @@ class DownloadDocumentService
         ])->deleteFileAfterSend(true);
     }
 
-    /**
-     * Sanitize filename by removing special characters
-     *
-     * @param string $filename
-     * @return string
-     */
+    public function downloadProofOfPayment(Registration $registration): BinaryFileResponse
+    {
+        // Pastikan relasi payment ada
+        $registration->load('payment', 'student');
+
+        if (!$registration->payment || !$registration->payment->proof_file) {
+            throw new \Exception('Bukti pembayaran tidak tersedia.');
+        }
+
+        $filePath = storage_path('app/public/' . $registration->payment->proof_file);
+
+        if (!file_exists($filePath)) {
+            throw new \Exception('File bukti pembayaran tidak ditemukan.');
+        }
+
+        // 🔐 STRICT MIME CHECK
+        $mime = $this->detectMimeTypeStrict($filePath);
+        $this->validateAllowedMime($mime);
+
+        // Ambil ekstensi file
+        $extension = pathinfo($filePath, PATHINFO_EXTENSION);
+        $code = $registration->registration_code ?? 'unknown';
+        $studentName = $this->sanitizeFilename($registration->student->full_name ?? 'unknown');
+
+        // Buat nama file: {kode}_{nama}_bukti_pembayaran.ext
+        $filename = "{$code}_{$studentName}_bukti_pembayaran.{$extension}";
+
+        return response()->download(
+            $filePath,
+            $filename,
+            [
+                'Content-Type' => $mime,
+                'X-Content-Type-Options' => 'nosniff',
+            ]
+        );
+    }
+
     private function sanitizeFilename(string $filename): string
     {
         // Replace spaces with underscores
@@ -107,5 +138,34 @@ class DownloadDocumentService
         $filename = trim($filename, '_');
 
         return $filename ?: 'document';
+    }
+
+    private function detectMimeTypeStrict(string $filePath): string
+    {
+        if (!extension_loaded('fileinfo')) {
+            throw new \Exception('PHP Fileinfo extension tidak tersedia.');
+        }
+
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $mime = $finfo->file($filePath);
+
+        if (!$mime) {
+            throw new \Exception('Gagal mendeteksi MIME type file.');
+        }
+
+        return $mime;
+    }
+
+    private function validateAllowedMime(string $mime): void
+    {
+        $allowedMimes = [
+            'image/jpeg',
+            'image/png',
+            'application/pdf',
+        ];
+
+        if (!in_array($mime, $allowedMimes, true)) {
+            throw new \Exception('Tipe file tidak diizinkan.');
+        }
     }
 }

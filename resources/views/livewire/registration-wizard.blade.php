@@ -1,4 +1,4 @@
-<div class="bg-indigo-50/50 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
+<div class="bg-indigo-50/50 min-h-screen py-12 px-0 sm:px-6 lg:px-8">
 	<div class="max-w-4xl mx-auto">
 		{{-- Header --}}
 		<div class="text-center mb-10">
@@ -8,7 +8,7 @@
 
 		<div class="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden">
 			{{-- Stepper --}}
-			<div class="bg-slate-50/50 border-b border-slate-100 px-6 py-6 sm:px-10">
+			<div class="hidden sm:block bg-slate-50/50 border-b border-slate-100 px-6 py-6 sm:px-10">
 				<nav aria-label="Progress">
 					<ol role="list" class="flex items-center justify-between w-full max-w-2xl mx-auto">
 						@foreach (range(1, $totalSteps) as $step)
@@ -67,7 +67,7 @@
 						</h2>
 
 						<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-							@foreach (['sd', 'smp', 'sma'] as $level)
+							@foreach (['smp', 'sma'] as $level)
 								<label class="relative group cursor-pointer">
 									<input type="radio" name="school_level" value="{{ $level }}" wire:model.live="school_level"
 										class="peer sr-only">
@@ -86,9 +86,7 @@
 											<div class="flex-1">
 												<div
 													class="font-bold text-md {{ $school_level == $level ? 'text-indigo-700' : 'text-slate-900 group-hover:text-indigo-700' }}">
-													@if ($level == 'sd')
-														Sekolah Dasar
-													@elseif($level == 'smp')
+													@if ($level == 'smp')
 														Sekolah Menengah Pertama
 													@elseif($level == 'sma')
 														Sekolah Menengah Atas
@@ -96,9 +94,7 @@
 												</div>
 
 												<p class="text-sm text-slate-500">
-													@if ($level == 'sd')
-														Kelas 1 - 6
-													@elseif($level == 'smp')
+													@if ($level == 'smp')
 														Kelas 7 - 9
 													@elseif($level == 'sma')
 														Kelas 10 - 12
@@ -140,8 +136,9 @@
 
 						<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 							<div class="col-span-full md:col-span-2">
-								<label for="full_name" class="block text-sm font-semibold text-slate-700 mb-2">Nama
-									Lengkap</label>
+								<label for="full_name" class="block text-sm font-semibold text-slate-700 mb-2">
+									Nama Lengkap
+								</label>
 								<input type="text" wire:model="full_name" id="full_name"
 									class="w-full rounded-xl border-slate-300 border focus:border-indigo-500 focus:ring-indigo-500 py-3 px-4 text-slate-900"
 									placeholder="Sesuai Akta Kelahiran">
@@ -151,8 +148,9 @@
 							</div>
 
 							<div>
-								<label for="nisn" class="block text-sm font-semibold text-slate-700 mb-2">NISN <span
-										class="text-slate-400 font-normal">(Opsional)</span></label>
+								<label for="nisn" class="block text-sm font-semibold text-slate-700 mb-2">
+									NISN
+								</label>
 								<input type="text" wire:model="nisn" id="nisn"
 									class="w-full rounded-xl border-slate-300 border focus:border-indigo-500 focus:ring-indigo-500 py-3 px-4 text-slate-900"
 									placeholder="Nomor Induk Siswa Nasional">
@@ -176,8 +174,9 @@
 							</div>
 
 							<div>
-								<label for="place_of_birth" class="block text-sm font-semibold text-slate-700 mb-2">Tempat
-									Lahir</label>
+								<label for="place_of_birth" class="block text-sm font-semibold text-slate-700 mb-2">
+									Tempat Lahir
+								</label>
 								<input type="text" wire:model="place_of_birth" id="place_of_birth"
 									class="w-full rounded-xl border-slate-300 border focus:border-indigo-500 focus:ring-indigo-500 py-3 px-4 text-slate-900"
 									placeholder="Kota Kelahiran">
@@ -253,7 +252,7 @@
 						</h2>
 
 						{{-- Father --}}
-						<div class="p-6 rounded-2xl border border-slate-100">
+						<div>
 							<h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
 								Data Ayah
 							</h3>
@@ -288,8 +287,10 @@
 							</div>
 						</div>
 
+						<div class="border-t border-gray-200"></div>
+
 						{{-- Mother --}}
-						<div class="p-6 rounded-2xl border border-slate-100">
+						<div>
 							<h3 class="text-lg font-bold text-slate-800 mb-4 flex items-center gap-2">
 								Data Ibu
 							</h3>
@@ -354,38 +355,72 @@
 						</div>
 
 						<div class="space-y-6">
-							@foreach (['document_kartu_keluarga' => 'Kartu Keluarga', 'document_akte_kelahiran' => 'Akte Kelahiran', 'document_ijazah' => 'Ijazah / SKL'] as $field => $label)
+							@foreach ($documents as $document)
 								<div class="bg-white border border-slate-200 rounded-xl p-5 hover:border-indigo-300 transition-colors">
-									<label for="{{ $field }}" class="flex items-center justify-between mb-2">
-										<span class="block text-base font-semibold text-slate-900">{{ $label }}</span>
-										@if ($field === 'document_ijazah')
-											<span class="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded">Opsional</span>
-										@else
+									<label class="flex items-center justify-between mb-2">
+										<span class="block text-base font-semibold text-slate-900">
+											{{ $document->name }}
+										</span>
+
+										@if ($document->is_required)
 											<span class="text-xs text-red-500 font-medium">*Wajib</span>
 										@endif
 									</label>
 
-									<input type="file" wire:model="{{ $field }}" id="{{ $field }}"
-										class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 " />
+									<input type="file" wire:model="uploadedDocuments.{{ $document->id }}" wire.loading.attr="disabled"
+										class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
 
-									<div wire:loading wire:target="{{ $field }}"
-										class="mt-2 text-sm text-indigo-600 italic flex items-center gap-1">
-										<svg class="animate-spin h-4 w-4 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none"
-											viewBox="0 0 24 24">
-											<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
-											</circle>
-											<path class="opacity-75" fill="currentColor"
-												d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-											</path>
-										</svg>
-										Uploading...
+									{{-- Preview file lama --}}
+									@if (isset($existingDocuments[$document->id]) &&
+											$existingDocuments[$document->id] &&
+											empty($uploadedDocuments[$document->id]))
+										<div class="mt-3 flex items-center gap-3 text-sm">
+											<span class="text-green-600 font-medium flex items-center gap-1">
+												✓ Dokumen sudah diupload
+											</span>
+
+											<a href="{{ Storage::url($existingDocuments[$document->id]) }}" target="_blank"
+												class="text-indigo-600 hover:underline font-semibold">
+												Lihat File
+											</a>
+										</div>
+									@endif
+
+									{{-- loading --}}
+									<div class="flex items-center mt-2">
+										<div wire:loading wire:loading.flex wire:target="uploadedDocuments.{{ $document->id }}"
+											class="text-sm text-indigo-600 italic flex items-center gap-1">
+											<svg class="animate-spin size-4 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none"
+												viewBox="0 0 24 24">
+												<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4">
+												</circle>
+												<path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0 C5.373 0 0 5.373 0 12h4z"></path>
+											</svg>
+											<span>Uploading...</span>
+										</div>
+
+										@if ($this->hasUploadedFile($document->id))
+											<div class="flex items-center justify-end gap-2 text-sm text-green-700">
+												<svg class="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+													<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+												</svg>
+
+												<span class="font-medium">
+													{{ $uploadedDocuments[$document->id]->getClientOriginalName() }}
+												</span>
+												<span class="text-slate-500">(file sudah dipilih)</span>
+											</div>
+										@endif
 									</div>
-									@error($field)
+
+									{{-- error --}}
+									@error("uploadedDocuments.{$document->id}")
 										<p class="mt-2 text-sm text-red-600">{{ $message }}</p>
 									@enderror
 								</div>
 							@endforeach
 						</div>
+
 					</div>
 				@endif
 
@@ -394,7 +429,9 @@
 					<div class="animate-fade-in-up">
 						<h2 class="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
 							<span
-								class="bg-indigo-100 text-indigo-700 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold">5</span>
+								class="bg-indigo-100 text-indigo-700 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold">
+								5
+							</span>
 							Konfirmasi Data
 						</h2>
 
@@ -416,24 +453,24 @@
 
 						<div class="bg-white border border-slate-200 rounded-2xl overflow-hidden mb-8">
 							<dl class="divide-y divide-slate-100">
-								<div class="px-6 py-4 grid grid-cols-3 gap-4 hover:bg-slate-50">
+								<div class="px-2 sm:px-6 py-4 grid grid-cols-3 gap-4 hover:bg-slate-50">
 									<dt class="text-sm font-medium text-slate-500">Jenjang Pendaftaran</dt>
 									<dd class="text-sm text-slate-900 font-bold col-span-2">{{ strtoupper($school_level) }}
 									</dd>
 								</div>
-								<div class="px-6 py-4 grid grid-cols-3 gap-4 hover:bg-slate-50">
+								<div class="px-2 sm:px-6 py-4 grid grid-cols-3 gap-4 hover:bg-slate-50">
 									<dt class="text-sm font-medium text-slate-500">Nama Lengkap</dt>
 									<dd class="text-sm text-slate-900 col-span-2">{{ $full_name }}</dd>
 								</div>
-								<div class="px-6 py-4 grid grid-cols-3 gap-4 hover:bg-slate-50">
+								<div class="px-2 sm:px-6 py-4 grid grid-cols-3 gap-4 hover:bg-slate-50">
 									<dt class="text-sm font-medium text-slate-500">Email</dt>
 									<dd class="text-sm text-slate-900 col-span-2">{{ $email }}</dd>
 								</div>
-								<div class="px-6 py-4 grid grid-cols-3 gap-4 hover:bg-slate-50">
+								<div class="px-2 sm:px-6 py-4 grid grid-cols-3 gap-4 hover:bg-slate-50">
 									<dt class="text-sm font-medium text-slate-500">No. HP</dt>
 									<dd class="text-sm text-slate-900 col-span-2">{{ $phone_number }}</dd>
 								</div>
-								<div class="px-6 py-4 grid grid-cols-3 gap-4 hover:bg-slate-50">
+								<div class="px-2 sm:px-6 py-4 grid grid-cols-3 gap-4 hover:bg-slate-50">
 									<dt class="text-sm font-medium text-slate-500">Orang Tua</dt>
 									<dd class="text-sm text-slate-900 col-span-2">{{ $father_name }} & {{ $mother_name }}
 									</dd>
@@ -457,8 +494,12 @@
 				<div class="mt-10 pt-6 border-t border-slate-100 flex justify-between items-center">
 					@if ($currentStep > 1)
 						<button type="button" wire:click="previousStep"
-							class="px-6 py-3 border border-slate-300 shadow-sm text-sm font-bold rounded-full text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-400 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-							&larr; Kembali
+							class="px-4 sm:px-6 py-3 flex items-center gap-x-1 border border-slate-300 shadow-sm text-sm font-bold rounded-full text-slate-700 bg-white hover:bg-slate-50 hover:border-slate-400 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+							<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+								stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4">
+								<path d="m15 18-6-6 6-6" />
+							</svg>
+							Kembali
 						</button>
 					@else
 						<div></div>
@@ -466,11 +507,14 @@
 
 					@if ($currentStep < $totalSteps)
 						<button type="button" wire:click="nextStep" wire:loading.attr="disabled"
-							class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-sm font-bold rounded-full shadow-lg text-white bg-indigo-600 hover:bg-indigo-700 hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed min-w-40">
+							class="inline-flex items-center justify-center gap-x-1 px-6 py-3 border border-transparent text-sm font-bold rounded-full shadow-lg text-white bg-indigo-600 hover:bg-indigo-700 hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
 
-							<span wire:loading.remove wire:target="nextStep" class="flex items-center gap-2">
+							<span wire:loading.remove wire:target="nextStep" class="flex items-center gap-1">
 								Selanjutnya
-								<span>&rarr;</span>
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+									stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-4">
+									<path d="m9 18 6-6-6-6" />
+								</svg>
 							</span>
 
 							<span wire:loading.flex wire:target="nextStep" class="flex items-center justify-center">
@@ -487,7 +531,7 @@
 						</button>
 					@else
 						<button type="submit" wire:loading.attr="disabled"
-							class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-sm font-bold rounded-full shadow-lg text-white bg-green-600 hover:bg-green-700 hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-70 disabled:cursor-not-allowed min-w-50">
+							class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-sm font-bold rounded-full text-white bg-green-600 hover:bg-green-700 hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-70 disabled:cursor-not-allowed">
 
 							<span wire:loading.remove wire:target="submit" class="flex items-center justify-center gap-2">
 								Kirim Pendaftaran

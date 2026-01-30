@@ -7,6 +7,10 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\Registration;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
 class RegistrationWizard extends Component
 {
@@ -21,6 +25,7 @@ class RegistrationWizard extends Component
     public $school_level;
 
     // Step 2: Student Profile
+    public $studentProfileId;
     public $full_name;
     public $email;
     public $phone_number;
@@ -43,14 +48,29 @@ class RegistrationWizard extends Component
     public $guardian_occupation;
 
     // Step 4: Documents
-    public $document_kartu_keluarga;
-    public $document_akte_kelahiran;
-    public $document_ijazah;
+    public array $uploadedDocuments = [];
+    public array $existingDocumentIds = [];
+    public array $existingDocuments = [];
+
+    public $documents;
 
     public function mount($code = null)
     {
+        $this->documents = \App\Models\Document::all();
+
         if ($code) {
-            $registration = Registration::with(['student', 'parentProfile'])->where('registration_code', $code)->firstOrFail();
+            $registration = Registration::with(['student', 'parent', 'documents'])->where('registration_code', $code)->firstOrFail();
+
+            foreach ($registration->documents as $doc) {
+                $this->existingDocuments[$doc->document_id] = $doc->file_path;
+                $this->uploadedDocuments[$doc->document_id] = null;
+            }
+
+            $this->existingDocumentIds = $registration->documents
+                ->pluck('document_id')
+                ->toArray();
+
+            // $this->uploadedDocuments = [];
 
             if ($registration->status !== RegistrationStatus::PERBAIKAN) {
                 abort(403, 'Pendaftaran tidak dapat diedit saat ini.');
@@ -58,9 +78,11 @@ class RegistrationWizard extends Component
 
             $this->registrationCode = $code;
             $this->isEdit = true;
-            $this->school_level = $registration->school_level;
+            $this->school_level = $registration->school_level->value;
 
             // Student
+            $this->studentProfileId = $registration->student->id;
+
             $this->full_name = $registration->student->full_name;
             $this->email = $registration->student->email;
             $this->phone_number = $registration->student->phone_number;
@@ -72,23 +94,29 @@ class RegistrationWizard extends Component
             $this->previous_school = $registration->student->previous_school;
 
             // Parent
-            $this->father_name = $registration->parentProfile->father_name;
-            $this->father_phone = $registration->parentProfile->father_phone;
-            $this->father_occupation = $registration->parentProfile->father_occupation;
-            $this->mother_name = $registration->parentProfile->mother_name;
-            $this->mother_phone = $registration->parentProfile->mother_phone;
-            $this->mother_occupation = $registration->parentProfile->mother_occupation;
-            $this->guardian_name = $registration->parentProfile->guardian_name;
-            $this->guardian_phone = $registration->parentProfile->guardian_phone;
-            $this->guardian_occupation = $registration->parentProfile->guardian_occupation;
+            $this->father_name = $registration->parent->father_name;
+            $this->father_phone = $registration->parent->father_phone;
+            $this->father_occupation = $registration->parent->father_occupation;
+            $this->mother_name = $registration->parent->mother_name;
+            $this->mother_phone = $registration->parent->mother_phone;
+            $this->mother_occupation = $registration->parent->mother_occupation;
+            $this->guardian_name = $registration->parent->guardian_name;
+            $this->guardian_phone = $registration->parent->guardian_phone;
+            $this->guardian_occupation = $registration->parent->guardian_occupation;
         }
+    }
+
+    public function hasUploadedFile($documentId): bool
+    {
+        return isset($this->uploadedDocuments[$documentId])
+            && $this->uploadedDocuments[$documentId] instanceof TemporaryUploadedFile;
     }
 
     public function validateStep($step)
     {
         if ($step == 1) {
             $this->validate([
-                'school_level' => 'required|in:sd,smp,sma',
+                'school_level' => ['required', 'in:smp,sma'],
             ]);
         } elseif ($step == 2) {
             $this->validate([
@@ -99,7 +127,15 @@ class RegistrationWizard extends Component
                 'place_of_birth' => 'required|string|max:255',
                 'date_of_birth' => 'required|date',
                 'address' => 'required|string',
-                'nisn' => 'nullable|string|max:20',
+                'nisn' => [
+                    'required',
+                    'string',
+                    'max:10',
+                    Rule::unique('student_profiles', 'nisn')
+                        ->ignore(
+                            $this->isEdit ? $this->studentProfileId : null
+                        ),
+                ],
                 'previous_school' => 'nullable|string|max:255',
             ]);
         } elseif ($step == 3) {
@@ -115,15 +151,19 @@ class RegistrationWizard extends Component
                 'guardian_occupation' => 'nullable|string|max:255',
             ]);
         } elseif ($step == 4) {
-            $rules = [
-                'document_kartu_keluarga' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
-                'document_akte_kelahiran' => 'required|file|mimes:pdf,jpg,jpeg,png|max:2048',
-                'document_ijazah' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
-            ];
+            $rules = [];
 
-            if ($this->isEdit) {
-                $rules['document_kartu_keluarga'] = 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048';
-                $rules['document_akte_kelahiran'] = 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048';
+            foreach ($this->documents as $document) {
+                $key = "uploadedDocuments.{$document->id}";
+
+                $hasExistingFile = $this->isEdit
+                    && in_array($document->id, $this->existingDocumentIds);
+
+                if ($document->is_required && !$hasExistingFile) {
+                    $rules[$key] = 'required|file|mimes:pdf,jpg,jpeg,png|max:2048';
+                } else {
+                    $rules[$key] = 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048';
+                }
             }
 
             $this->validate($rules);
@@ -149,9 +189,9 @@ class RegistrationWizard extends Component
             if ($this->isEdit) {
                 // Update Existing
                 $registration = Registration::where('registration_code', $this->registrationCode)->firstOrFail();
+
                 $registration->update([
-                    'school_level' => $this->school_level,
-                    'status' => RegistrationStatus::PERBAIKAN,
+                    'status' => RegistrationStatus::VERIFIKASI,
                 ]);
 
                 $registration->student()->update([
@@ -166,7 +206,7 @@ class RegistrationWizard extends Component
                     'previous_school' => $this->previous_school,
                 ]);
 
-                $registration->parentProfile()->update([
+                $registration->parent()->update([
                     'father_name' => $this->father_name,
                     'father_phone' => $this->father_phone,
                     'father_occupation' => $this->father_occupation,
@@ -180,7 +220,7 @@ class RegistrationWizard extends Component
             } else {
                 // Create New
                 $registration = Registration::create([
-                    'registration_code' => 'REG-' . date('Y') . '-' . mt_rand(1000, 9999),
+                    'registration_code' => 'REG-' . now()->format('Ymd') . '-' . Str::upper(Str::random(5)),
                     'school_level' => $this->school_level,
                     'status' => RegistrationStatus::PEMBAYARAN_TERTUNDA,
                     'total_amount' => 150000,
@@ -198,7 +238,7 @@ class RegistrationWizard extends Component
                     'previous_school' => $this->previous_school,
                 ]);
 
-                $registration->parentProfile()->create([
+                $registration->parent()->create([
                     'father_name' => $this->father_name,
                     'father_phone' => $this->father_phone,
                     'father_occupation' => $this->father_occupation,
@@ -212,27 +252,24 @@ class RegistrationWizard extends Component
             }
 
             // Save Documents (Upsert logic)
-            $docs = [
-                'kartu_keluarga' => $this->document_kartu_keluarga,
-                'akte_kelahiran' => $this->document_akte_kelahiran,
-                'ijazah' => $this->document_ijazah,
-            ];
+            foreach ($this->uploadedDocuments as $documentId => $file) {
+                if (!$file) continue;
 
-            foreach ($docs as $type => $file) {
-                if ($file) {
-                    $path = $file->store('documents', 'public');
+                // hapus file lama
+                $old = $registration->documents()
+                    ->where('document_id', $documentId)
+                    ->first();
 
-                    if ($this->isEdit) {
-                        $doc = $registration->documents()->where('type', $type)->first();
-                        if ($doc) {
-                            $doc->update(['file_path' => $path]);
-                        } else {
-                            $registration->documents()->create(['type' => $type, 'file_path' => $path]);
-                        }
-                    } else {
-                        $registration->documents()->create(['type' => $type, 'file_path' => $path]);
-                    }
+                if ($old && $old->file_path) {
+                    Storage::disk('public')->delete($old->file_path);
                 }
+
+                $path = $file->store('documents', 'public');
+
+                $registration->documents()->updateOrCreate(
+                    ['document_id' => $documentId],
+                    ['file_path' => $path]
+                );
             }
 
             if ($this->isEdit) {

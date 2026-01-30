@@ -12,8 +12,9 @@ enum RegistrationStatus: string implements HasLabel, HasColor
     case PEMBAYARAN_TERTUNDA = 'pembayaran tertunda';
     case PEMBAYARAN_TERVERIFIKASI = 'pembayaran terverifikasi';
     case TERVERIFIKASI = 'terverifikasi';
-    case DITERIMA = 'diterima';
-    case DITOLAK = 'ditolak';
+    case LULUS = 'lulus';
+    case CADANGAN = 'cadangan';
+    case TIDAK_LULUS = 'tidak lulus';
 
     public function getLabel(): string
     {
@@ -23,8 +24,9 @@ enum RegistrationStatus: string implements HasLabel, HasColor
             self::PEMBAYARAN_TERTUNDA => 'Menunggu Pembayaran',
             self::PEMBAYARAN_TERVERIFIKASI => 'Pembayaran Terverifikasi',
             self::TERVERIFIKASI => 'Terverifikasi',
-            self::DITERIMA => 'Diterima',
-            self::DITOLAK => 'Ditolak',
+            self::LULUS => 'Lulus',
+            self::CADANGAN => 'Cadangan',
+            self::TIDAK_LULUS => 'Tidak Lulus',
         };
     }
 
@@ -36,8 +38,9 @@ enum RegistrationStatus: string implements HasLabel, HasColor
             self::PEMBAYARAN_TERTUNDA => 'warning',
             self::PEMBAYARAN_TERVERIFIKASI => 'success',
             self::TERVERIFIKASI => 'info',
-            self::DITERIMA => 'success',
-            self::DITOLAK => 'danger',
+            self::LULUS => 'success',
+            self::CADANGAN => 'warning',
+            self::TIDAK_LULUS => 'danger',
         };
     }
 
@@ -49,8 +52,9 @@ enum RegistrationStatus: string implements HasLabel, HasColor
             self::PEMBAYARAN_TERTUNDA => 'heroicon-o-currency-dollar',
             self::PEMBAYARAN_TERVERIFIKASI => 'heroicon-o-check-circle',
             self::TERVERIFIKASI => 'heroicon-o-check-circle',
-            self::DITERIMA => 'heroicon-o-check-badge',
-            self::DITOLAK => 'heroicon-o-x-circle',
+            self::LULUS => 'heroicon-o-check-badge',
+            self::CADANGAN => 'heroicon-o-clock',
+            self::TIDAK_LULUS => 'heroicon-o-x-circle',
         };
     }
 
@@ -62,8 +66,9 @@ enum RegistrationStatus: string implements HasLabel, HasColor
             self::PEMBAYARAN_TERTUNDA => 'bg-yellow-100 text-yellow-800 border-yellow-300',
             self::PEMBAYARAN_TERVERIFIKASI => 'bg-green-100 text-green-800 border-green-300',
             self::TERVERIFIKASI => 'bg-indigo-100 text-indigo-800 border-indigo-300',
-            self::DITERIMA => 'bg-green-100 text-green-800 border-green-300',
-            self::DITOLAK => 'bg-red-100 text-red-800 border-red-300',
+            self::LULUS => 'bg-green-100 text-green-800 border-green-300',
+            self::CADANGAN => 'bg-yellow-100 text-yellow-800 border-yellow-300',
+            self::TIDAK_LULUS => 'bg-red-100 text-red-800 border-red-300',
         };
     }
 
@@ -75,8 +80,9 @@ enum RegistrationStatus: string implements HasLabel, HasColor
             self::PEMBAYARAN_TERTUNDA => '💳',
             self::PEMBAYARAN_TERVERIFIKASI => '✅',
             self::TERVERIFIKASI => '🔍',
-            self::DITERIMA => '🎉',
-            self::DITOLAK => '❌',
+            self::LULUS => '🎉',
+            self::CADANGAN => '⏳',
+            self::TIDAK_LULUS => '❌',
         };
     }
 }

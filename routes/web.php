@@ -22,7 +22,7 @@ Route::post('/status', function (\Illuminate\Http\Request $request) {
 })->name('status.check');
 
 Route::get('/registration/{code}', function ($code) {
-    $registration = \App\Models\Registration::with(['student', 'parentProfile', 'documents', 'payment'])
+    $registration = \App\Models\Registration::with(['student', 'parent', 'documents', 'payment'])
         ->where('registration_code', $code)
         ->firstOrFail();
 
@@ -30,6 +30,5 @@ Route::get('/registration/{code}', function ($code) {
 })->name('status.show');
 
 // Payment Routes
-Route::post('/payment/snap-token', [PaymentController::class, 'getToken'])->name('payment.snap-token');
-Route::post('/payment/callback', [PaymentController::class, 'handleCallback'])->name('payment.callback');
-Route::post('/payment/notification', [PaymentController::class, 'handleNotification'])->name('payment.notification');
+Route::post('/payments/{registration}/upload', [PaymentController::class, 'upload'])
+    ->name('payments.upload');
