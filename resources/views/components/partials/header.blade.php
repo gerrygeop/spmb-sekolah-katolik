@@ -11,7 +11,7 @@
 				</div>
 				<div>
 					<span class="text-xl font-bold text-slate-900 block leading-none">SPMB Sekolah</span>
-					<span class="text-xs text-slate-500 font-medium">Penerimaan Peserta Didik Baru</span>
+					<span class="text-xs text-slate-500 font-medium">Sistem Penerimaan Murid Baru</span>
 				</div>
 			</a>
 			<div class="hidden md:flex space-x-8 items-center">
