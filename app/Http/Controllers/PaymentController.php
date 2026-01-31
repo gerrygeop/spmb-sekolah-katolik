@@ -15,7 +15,7 @@ class PaymentController extends Controller
             'proof_file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
-        DB::transaction(function () {
+        DB::transaction(function () use ($request, $registration) {
             $path = $request->file('proof_file')
                 ->store('payment-proofs', 'public');
 
