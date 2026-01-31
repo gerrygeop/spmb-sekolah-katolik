@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\RegistrationStatus;
 use App\Models\Payment;
 use App\Models\Registration;
 use Illuminate\Http\Request;
@@ -24,9 +25,10 @@ class PaymentController extends Controller
                 ['proof_file' => $path]
             );
 
-            $registration->update([
-                'status' => \App\Enums\RegistrationStatus::VERIFIKASI,
-            ]);
+            $registration->changeStatus(
+                RegistrationStatus::VERIFIKASI,
+                'Pendaftar mengunggah bukti pembayaran'
+            );
         });
 
         return back()->with('success', 'Bukti pembayaran berhasil diunggah.');

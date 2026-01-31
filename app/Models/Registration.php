@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Enums\RegistrationStatus;
+use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -47,5 +49,23 @@ class Registration extends Model
     public function logs(): HasMany
     {
         return $this->hasMany(RegistrationLog::class);
+    }
+
+    public function changeStatus(RegistrationStatus $toStatus, ?string $description = null, ?string $notes = null): void
+    {
+        $fromStatus = $this->status;
+        if ($fromStatus === $toStatus) return;
+
+        $this->update([
+            'status' => $toStatus,
+            'notes' => $notes,
+        ]);
+
+        $this->logs()->create([
+            'user_id' => auth()->check() && auth()->user()->role === UserRole::ADMIN ? auth()->id() : null,
+            'from_status' => $fromStatus,
+            'to_status' => $toStatus,
+            'description' => $description
+        ]);
     }
 }

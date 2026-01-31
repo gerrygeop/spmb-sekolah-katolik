@@ -10,7 +10,6 @@ enum RegistrationStatus: string implements HasLabel, HasColor
     case VERIFIKASI = 'verifikasi';
     case PERBAIKAN = 'perlu perbaikan';
     case PEMBAYARAN_TERTUNDA = 'pembayaran tertunda';
-    case PEMBAYARAN_TERVERIFIKASI = 'pembayaran terverifikasi';
     case TERVERIFIKASI = 'terverifikasi';
     case LULUS = 'lulus';
     case CADANGAN = 'cadangan';
@@ -22,7 +21,6 @@ enum RegistrationStatus: string implements HasLabel, HasColor
             self::VERIFIKASI => 'Sedang Diverifikasi',
             self::PERBAIKAN => 'Perlu Perbaikan',
             self::PEMBAYARAN_TERTUNDA => 'Menunggu Pembayaran',
-            self::PEMBAYARAN_TERVERIFIKASI => 'Pembayaran Terverifikasi',
             self::TERVERIFIKASI => 'Terverifikasi',
             self::LULUS => 'Lulus',
             self::CADANGAN => 'Cadangan',
@@ -36,7 +34,6 @@ enum RegistrationStatus: string implements HasLabel, HasColor
             self::VERIFIKASI => 'primary',
             self::PERBAIKAN => 'danger',
             self::PEMBAYARAN_TERTUNDA => 'warning',
-            self::PEMBAYARAN_TERVERIFIKASI => 'success',
             self::TERVERIFIKASI => 'info',
             self::LULUS => 'success',
             self::CADANGAN => 'warning',
@@ -50,7 +47,6 @@ enum RegistrationStatus: string implements HasLabel, HasColor
             self::VERIFIKASI => 'heroicon-o-clock',
             self::PERBAIKAN => 'heroicon-o-exclamation-triangle',
             self::PEMBAYARAN_TERTUNDA => 'heroicon-o-currency-dollar',
-            self::PEMBAYARAN_TERVERIFIKASI => 'heroicon-o-check-circle',
             self::TERVERIFIKASI => 'heroicon-o-check-circle',
             self::LULUS => 'heroicon-o-check-badge',
             self::CADANGAN => 'heroicon-o-clock',
@@ -64,7 +60,6 @@ enum RegistrationStatus: string implements HasLabel, HasColor
             self::VERIFIKASI => 'bg-blue-100 text-blue-800 border-blue-300',
             self::PERBAIKAN => 'bg-orange-100 text-orange-800 border-orange-300',
             self::PEMBAYARAN_TERTUNDA => 'bg-yellow-100 text-yellow-800 border-yellow-300',
-            self::PEMBAYARAN_TERVERIFIKASI => 'bg-green-100 text-green-800 border-green-300',
             self::TERVERIFIKASI => 'bg-indigo-100 text-indigo-800 border-indigo-300',
             self::LULUS => 'bg-green-100 text-green-800 border-green-300',
             self::CADANGAN => 'bg-yellow-100 text-yellow-800 border-yellow-300',
@@ -78,8 +73,7 @@ enum RegistrationStatus: string implements HasLabel, HasColor
             self::VERIFIKASI => '📝',
             self::PERBAIKAN => '⚠️',
             self::PEMBAYARAN_TERTUNDA => '💳',
-            self::PEMBAYARAN_TERVERIFIKASI => '✅',
-            self::TERVERIFIKASI => '🔍',
+            self::TERVERIFIKASI => '✅',
             self::LULUS => '🎉',
             self::CADANGAN => '⏳',
             self::TIDAK_LULUS => '❌',

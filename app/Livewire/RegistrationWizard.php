@@ -202,9 +202,10 @@ class RegistrationWizard extends Component
                         ->lockForUpdate()
                         ->firstOrFail();
 
-                    $registration->update([
-                        'status' => RegistrationStatus::VERIFIKASI,
-                    ]);
+                    $registration->changeStatus(
+                        RegistrationStatus::VERIFIKASI,
+                        'Pendaftar mengedit data'
+                    );
 
                     $registration->student()->update([
                         'full_name' => $this->full_name,

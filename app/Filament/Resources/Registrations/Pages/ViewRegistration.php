@@ -44,12 +44,13 @@ class ViewRegistration extends ViewRecord
                         ->required(fn(Get $get) => $get('status') === RegistrationStatus::PERBAIKAN->value),
                 ])
                 ->action(function (array $data): void {
-                    $this->record->update([
-                        'status' => $data['status'],
-                        'notes' => $data['notes'],
-                    ]);
-
                     $status = RegistrationStatus::from($data['status']);
+
+                    $this->record->changeStatus(
+                        $status,
+                        'Admin mengubah status',
+                        $data['notes'],
+                    );
 
                     Notification::make()
                         ->title('Status Diperbarui')
