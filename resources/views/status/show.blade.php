@@ -92,6 +92,25 @@
 								Belum ada dokumen yang diunggah.
 							</p>
 						@endforelse
+
+						@if ($registration->payment)
+							<div class="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
+								<div>
+									<p class="text-sm font-medium text-slate-800">
+										Bukti Pembayaran
+									</p>
+								</div>
+
+								<a href="{{ Storage::url($registration->payment->proof_file) }}" target="_blank"
+									class="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 text-sm font-semibold">
+									Lihat
+									<svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24"
+										stroke="currentColor">
+										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7-7 7M21 12H3" />
+									</svg>
+								</a>
+							</div>
+						@endif
 					</div>
 				</div>
 			</div>

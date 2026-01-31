@@ -329,7 +329,7 @@
 
 				{{-- Step 4: Documents --}}
 				@if ($currentStep == 4)
-					<div class="animate-fade-in-up space-y-6">
+					<div class="space-y-6">
 						<h2 class="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
 							<span
 								class="bg-indigo-100 text-indigo-700 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold">4</span>
@@ -419,8 +419,55 @@
 									@enderror
 								</div>
 							@endforeach
-						</div>
 
+							@if ($isEdit)
+								<div class="bg-white border border-slate-200 rounded-xl p-5 hover:border-indigo-300 transition-colors">
+									<label class="flex items-center justify-between mb-2">
+										<span class="block text-base font-semibold text-slate-900">
+											Bukti Pembayaran
+										</span>
+
+										<span class="text-xs text-red-500 font-medium">*Wajib</span>
+									</label>
+
+									<input type="file" wire:model="payment_proof" wire.loading.attr="disabled"
+										class="block w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+
+									{{-- Preview file lama --}}
+									@if ($payment && $payment->proof_file)
+										<div class="mt-3 flex items-center gap-3 text-sm">
+											<span class="text-green-600 font-medium flex items-center gap-1">
+												✓ Bukti Pembayaran Saat Ini:
+											</span>
+											<a href="{{ Storage::url($payment->proof_file) }}" target="_blank"
+												class="text-indigo-600 hover:underline font-semibold flex items-center gap-1">
+												Lihat File Lama
+											</a>
+										</div>
+									@endif
+
+									{{-- Loading Indicator --}}
+									<div wire:loading wire:target="payment_proof" class="mt-2 text-sm text-indigo-600 italic">
+										<span>Uploading new proof...</span>
+									</div>
+
+									{{-- Preview Nama File Baru setelah dipilih --}}
+									@if ($payment_proof instanceof \Livewire\Features\SupportFileUploads\TemporaryUploadedFile)
+										<div class="mt-2 flex items-center gap-2 text-sm text-green-700 font-medium">
+											<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+												<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+											</svg>
+											File siap diupload: {{ $payment_proof->getClientOriginalName() }}
+										</div>
+									@endif
+
+									{{-- error --}}
+									@error('payment_proof')
+										<p class="mt-2 text-sm text-red-600">{{ $message }}</p>
+									@enderror
+								</div>
+							@endif
+						</div>
 					</div>
 				@endif
 

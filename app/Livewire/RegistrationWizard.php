@@ -54,12 +54,15 @@ class RegistrationWizard extends Component
     public array $existingDocumentIds = [];
     public array $existingDocuments = [];
 
+    public $payment;
+    public $payment_proof;
+
     public function mount($code = null)
     {
         $this->documents = \App\Models\Document::all();
 
         if ($code) {
-            $registration = Registration::with(['student', 'parent', 'documents'])->where('registration_code', $code)->firstOrFail();
+            $registration = Registration::with(['student', 'parent', 'payment', 'documents'])->where('registration_code', $code)->firstOrFail();
 
             abort_if($registration->status !== RegistrationStatus::PERBAIKAN, 403, 'Pendaftaran tidak dapat diedit saat ini.');
 
@@ -67,6 +70,8 @@ class RegistrationWizard extends Component
                 $this->existingDocuments[$doc->document_id] = $doc->file_path;
                 $this->uploadedDocuments[$doc->document_id] = null;
             }
+
+            $this->payment = $registration->payment;
 
             $this->existingDocumentIds = $registration->documents
                 ->pluck('document_id')
@@ -160,6 +165,12 @@ class RegistrationWizard extends Component
                 } else {
                     $rules[$key] = 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048';
                 }
+            }
+
+            if ($this->isEdit) {
+                $this->validate([
+                    'payment_proof' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048'
+                ]);
             }
 
             $this->validate($rules);
@@ -269,6 +280,18 @@ class RegistrationWizard extends Component
                         ['document_id' => $documentId],
                         ['file_path' => $path]
                     );
+                }
+
+                if ($this->payment_proof && $this->isEdit) {
+                    if ($registration->payment && $registration->payment->proof_file) {
+                        Storage::disk('public')->delete($registration->payment->proof_file);
+                    }
+
+                    $path = $this->payment_proof->store('payment-proofs', 'public');
+
+                    $registration->payment()->update([
+                        'proof_file' => $path,
+                    ]);
                 }
 
                 return $registration;
