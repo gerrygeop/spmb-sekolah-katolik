@@ -20,4 +20,13 @@ enum UserRole: string implements HasLabel
             self::USER => 'User',
         };
     }
+
+    public function isAnyAdmin(): bool
+    {
+        return in_array($this, [
+            self::ADMIN,
+            self::ADMIN_SMA,
+            self::ADMIN_SMP,
+        ]);
+    }
 }

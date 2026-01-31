@@ -37,4 +37,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(RegistrationLog::class);
     }
+
+    public function hasAdminAccess(): bool
+    {
+        // Memanggil method yang ada di Enum
+        return $this->role->isAnyAdmin();
+    }
 }
