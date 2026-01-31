@@ -18,10 +18,11 @@ class RegistrationWizard extends Component
 
     public $currentStep = 1;
     public $totalSteps = 5;
-    public $registrationCode;
     public $isEdit = false;
+    public bool $isSubmitting = false;
 
     // Step 1: School Level
+    public $registrationCode;
     public $school_level;
 
     // Step 2: Student Profile
@@ -48,11 +49,10 @@ class RegistrationWizard extends Component
     public $guardian_occupation;
 
     // Step 4: Documents
+    public $documents;
     public array $uploadedDocuments = [];
     public array $existingDocumentIds = [];
     public array $existingDocuments = [];
-
-    public $documents;
 
     public function mount($code = null)
     {
@@ -60,6 +60,8 @@ class RegistrationWizard extends Component
 
         if ($code) {
             $registration = Registration::with(['student', 'parent', 'documents'])->where('registration_code', $code)->firstOrFail();
+
+            abort_if($registration->status !== RegistrationStatus::PERBAIKAN, 403, 'Pendaftaran tidak dapat diedit saat ini.');
 
             foreach ($registration->documents as $doc) {
                 $this->existingDocuments[$doc->document_id] = $doc->file_path;
@@ -69,12 +71,6 @@ class RegistrationWizard extends Component
             $this->existingDocumentIds = $registration->documents
                 ->pluck('document_id')
                 ->toArray();
-
-            // $this->uploadedDocuments = [];
-
-            if ($registration->status !== RegistrationStatus::PERBAIKAN) {
-                abort(403, 'Pendaftaran tidak dapat diedit saat ini.');
-            }
 
             $this->registrationCode = $code;
             $this->isEdit = true;
@@ -183,102 +179,118 @@ class RegistrationWizard extends Component
 
     public function submit()
     {
+        if ($this->isSubmitting) return;
+        $this->isSubmitting = true;
+
         $this->validateStep($this->currentStep);
 
-        DB::transaction(function () {
-            if ($this->isEdit) {
-                // Update Existing
-                $registration = Registration::where('registration_code', $this->registrationCode)->firstOrFail();
+        try {
+            $registration = DB::transaction(function () {
+                if ($this->isEdit) {
+                    $registration = Registration::where('registration_code', $this->registrationCode)
+                        ->lockForUpdate()
+                        ->firstOrFail();
 
-                $registration->update([
-                    'status' => RegistrationStatus::VERIFIKASI,
-                ]);
+                    $registration->update([
+                        'status' => RegistrationStatus::VERIFIKASI,
+                    ]);
 
-                $registration->student()->update([
-                    'full_name' => $this->full_name,
-                    'email' => $this->email,
-                    'phone_number' => $this->phone_number,
-                    'gender' => $this->gender,
-                    'place_of_birth' => $this->place_of_birth,
-                    'date_of_birth' => $this->date_of_birth,
-                    'address' => $this->address,
-                    'nisn' => $this->nisn,
-                    'previous_school' => $this->previous_school,
-                ]);
+                    $registration->student()->update([
+                        'full_name' => $this->full_name,
+                        'email' => $this->email,
+                        'phone_number' => $this->phone_number,
+                        'gender' => $this->gender,
+                        'place_of_birth' => $this->place_of_birth,
+                        'date_of_birth' => $this->date_of_birth,
+                        'address' => $this->address,
+                        'nisn' => $this->nisn,
+                        'previous_school' => $this->previous_school,
+                    ]);
 
-                $registration->parent()->update([
-                    'father_name' => $this->father_name,
-                    'father_phone' => $this->father_phone,
-                    'father_occupation' => $this->father_occupation,
-                    'mother_name' => $this->mother_name,
-                    'mother_phone' => $this->mother_phone,
-                    'mother_occupation' => $this->mother_occupation,
-                    'guardian_name' => $this->guardian_name,
-                    'guardian_phone' => $this->guardian_phone,
-                    'guardian_occupation' => $this->guardian_occupation,
-                ]);
-            } else {
-                // Create New
-                $registration = Registration::create([
-                    'registration_code' => 'REG-' . now()->format('Ymd') . '-' . Str::upper(Str::random(5)),
-                    'school_level' => $this->school_level,
-                    'status' => RegistrationStatus::PEMBAYARAN_TERTUNDA,
-                    'total_amount' => 150000,
-                ]);
+                    $registration->parent()->update([
+                        'father_name' => $this->father_name,
+                        'father_phone' => $this->father_phone,
+                        'father_occupation' => $this->father_occupation,
+                        'mother_name' => $this->mother_name,
+                        'mother_phone' => $this->mother_phone,
+                        'mother_occupation' => $this->mother_occupation,
+                        'guardian_name' => $this->guardian_name,
+                        'guardian_phone' => $this->guardian_phone,
+                        'guardian_occupation' => $this->guardian_occupation,
+                    ]);
+                } else {
+                    // Create New
+                    $registration = Registration::create([
+                        'registration_code' => 'REG-' . now()->format('Ymd') . '-' . Str::upper(Str::random(5)),
+                        'school_level' => $this->school_level,
+                        'status' => RegistrationStatus::PEMBAYARAN_TERTUNDA,
+                        'total_amount' => 150000,
+                    ]);
 
-                $registration->student()->create([
-                    'full_name' => $this->full_name,
-                    'email' => $this->email,
-                    'phone_number' => $this->phone_number,
-                    'gender' => $this->gender,
-                    'place_of_birth' => $this->place_of_birth,
-                    'date_of_birth' => $this->date_of_birth,
-                    'address' => $this->address,
-                    'nisn' => $this->nisn,
-                    'previous_school' => $this->previous_school,
-                ]);
+                    $registration->student()->create([
+                        'full_name' => $this->full_name,
+                        'email' => $this->email,
+                        'phone_number' => $this->phone_number,
+                        'gender' => $this->gender,
+                        'place_of_birth' => $this->place_of_birth,
+                        'date_of_birth' => $this->date_of_birth,
+                        'address' => $this->address,
+                        'nisn' => $this->nisn,
+                        'previous_school' => $this->previous_school,
+                    ]);
 
-                $registration->parent()->create([
-                    'father_name' => $this->father_name,
-                    'father_phone' => $this->father_phone,
-                    'father_occupation' => $this->father_occupation,
-                    'mother_name' => $this->mother_name,
-                    'mother_phone' => $this->mother_phone,
-                    'mother_occupation' => $this->mother_occupation,
-                    'guardian_name' => $this->guardian_name,
-                    'guardian_phone' => $this->guardian_phone,
-                    'guardian_occupation' => $this->guardian_occupation,
-                ]);
-            }
-
-            // Save Documents (Upsert logic)
-            foreach ($this->uploadedDocuments as $documentId => $file) {
-                if (!$file) continue;
-
-                // hapus file lama
-                $old = $registration->documents()
-                    ->where('document_id', $documentId)
-                    ->first();
-
-                if ($old && $old->file_path) {
-                    Storage::disk('public')->delete($old->file_path);
+                    $registration->parent()->create([
+                        'father_name' => $this->father_name,
+                        'father_phone' => $this->father_phone,
+                        'father_occupation' => $this->father_occupation,
+                        'mother_name' => $this->mother_name,
+                        'mother_phone' => $this->mother_phone,
+                        'mother_occupation' => $this->mother_occupation,
+                        'guardian_name' => $this->guardian_name,
+                        'guardian_phone' => $this->guardian_phone,
+                        'guardian_occupation' => $this->guardian_occupation,
+                    ]);
                 }
 
-                $path = $file->store('documents', 'public');
+                // Save Documents
+                foreach ($this->uploadedDocuments as $documentId => $file) {
+                    if (!$file) continue;
 
-                $registration->documents()->updateOrCreate(
-                    ['document_id' => $documentId],
-                    ['file_path' => $path]
+                    $old = $registration->documents()
+                        ->where('document_id', $documentId)
+                        ->first();
+
+                    if ($old && $old->file_path) {
+                        Storage::disk('public')->delete($old->file_path);
+                    }
+
+                    $path = $file->store('documents', 'public');
+                    $registration->documents()->updateOrCreate(
+                        ['document_id' => $documentId],
+                        ['file_path' => $path]
+                    );
+                }
+
+                return $registration;
+            });
+
+            return redirect()
+                ->route('status.show', ['code' => $registration->registration_code])
+                ->with(
+                    $this->isEdit ? 'message' : 'success',
+                    $this->isEdit
+                        ? 'Data berhasil diperbarui!'
+                        : 'Pendaftaran berhasil diterima! Silakan selesaikan pembayaran di bawah ini.'
                 );
-            }
-
-            if ($this->isEdit) {
-                return redirect()->route('status.show', ['code' => $registration->registration_code])->with('message', 'Data berhasil diperbarui!');
-            }
-
-            return redirect()->route('status.show', ['code' => $registration->registration_code])
-                ->with('success', 'Pendaftaran berhasil diterima! Silakan selesaikan pembayaran di bawah ini.');
-        });
+        } catch (\Throwable $th) {
+            logger()->error('Error during registration submission: ' . $th->getMessage());
+            return redirect()
+                ->back()
+                ->withInput()
+                ->with('submit', 'Terjadi kesalahan saat memproses pendaftaran. Silakan coba lagi.');
+        } finally {
+            $this->isSubmitting = false;
+        }
     }
 
     public function render()

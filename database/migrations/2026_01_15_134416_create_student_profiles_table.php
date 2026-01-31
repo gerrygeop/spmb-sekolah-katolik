@@ -15,13 +15,13 @@ return new class extends Migration
             $table->id();
             $table->foreignId('registration_id')->constrained('registrations')->onDelete('cascade');
             $table->string('full_name');
-            $table->string('email');
+            $table->string('nisn')->unique();
+            $table->string('email')->unique();
             $table->string('phone_number');
             $table->enum('gender', ['Laki-laki', 'Perempuan']);
             $table->string('place_of_birth');
             $table->date('date_of_birth');
             $table->text('address');
-            $table->string('nisn')->nullable();
             $table->string('previous_school')->nullable();
             $table->timestamps();
         });

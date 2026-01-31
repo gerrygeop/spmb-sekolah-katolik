@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Payment;
 use App\Models\Registration;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class PaymentController extends Controller
 {
@@ -14,17 +15,19 @@ class PaymentController extends Controller
             'proof_file' => 'required|file|mimes:jpg,jpeg,png,pdf|max:2048',
         ]);
 
-        $path = $request->file('proof_file')
-            ->store('payment-proofs', 'public');
+        DB::transaction(function () {
+            $path = $request->file('proof_file')
+                ->store('payment-proofs', 'public');
 
-        Payment::updateOrCreate(
-            ['registration_id' => $registration->id],
-            ['proof_file' => $path]
-        );
+            Payment::updateOrCreate(
+                ['registration_id' => $registration->id],
+                ['proof_file' => $path]
+            );
 
-        $registration->update([
-            'status' => \App\Enums\RegistrationStatus::VERIFIKASI,
-        ]);
+            $registration->update([
+                'status' => \App\Enums\RegistrationStatus::VERIFIKASI,
+            ]);
+        });
 
         return back()->with('success', 'Bukti pembayaran berhasil diunggah.');
     }

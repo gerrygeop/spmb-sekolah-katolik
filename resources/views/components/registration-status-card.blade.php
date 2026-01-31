@@ -104,6 +104,12 @@
 							(Format file yang diterima: <strong>PDF, JPG, JPEG, PNG</strong>.
 							Maksimal <strong>2MB</strong>)
 						</span>
+
+						@error('proof_file')
+							<p class="text-sm text-red-500 mt-2">
+								{{ $message }}
+							</p>
+						@enderror
 					</div>
 					<button type="submit"
 						class="w-full md:w-auto px-10 py-3 bg-slate-800 text-white font-black text-xs uppercase tracking-widest rounded-xl hover:bg-slate-900 shadow-lg shadow-slate-900/20 transition-all active:scale-95">

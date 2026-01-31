@@ -426,69 +426,100 @@
 
 				{{-- Step 5: Confirmation --}}
 				@if ($currentStep == 5)
-					<div class="animate-fade-in-up">
-						<h2 class="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-							<span
-								class="bg-indigo-100 text-indigo-700 w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold">
+					<div class="max-w-3xl mx-auto space-y-8">
+						{{-- Header --}}
+						<div class="flex items-center gap-4">
+							<div
+								class="bg-green-600 text-white w-10 h-10 rounded-xl flex items-center justify-center text-lg font-bold shadow-lg shadow-green-100">
 								5
-							</span>
-							Konfirmasi Data
-						</h2>
+							</div>
+							<div>
+								<h2 class="text-2xl font-bold text-slate-900">Konfirmasi Data</h2>
+								<p class="text-sm text-slate-500">Pastikan data berikut sudah sesuai sebelum pendaftaran dikunci.</p>
+							</div>
+						</div>
 
-						<div class="bg-yellow-50 border border-yellow-200 rounded-xl p-5 mb-8">
+						{{-- Alert Box --}}
+						<div class="bg-amber-50 border border-amber-200 rounded-2xl p-5">
 							<div class="flex items-start gap-4">
-								<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-600 mt-1" fill="none"
-									viewBox="0 0 24 24" stroke="currentColor">
+								<svg class="h-6 w-6 text-amber-600 shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24"
+									stroke="currentColor">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
 										d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
 								</svg>
 								<div>
-									<h3 class="text-yellow-800 font-bold">Periksa Kembali Data Anda</h3>
-									<p class="text-yellow-700 text-sm mt-1">Pastikan seluruh data yang Anda masukkan sudah
-										benar. Data tidak dapat diubah setelah pendaftaran dikirim (kecuali diminta
-										perbaikan).</p>
+									<h3 class="text-amber-800 font-bold text-sm">Peringatan Penting</h3>
+									<p class="text-amber-700 text-xs md:text-sm mt-1 leading-relaxed">
+										Setelah tombol pendaftaran dikirim, Anda <strong>tidak dapat mengubah data secara mandiri</strong> kecuali ada
+										instruksi perbaikan dari panitia.
+									</p>
 								</div>
 							</div>
 						</div>
 
-						<div class="bg-white border border-slate-200 rounded-2xl overflow-hidden mb-8">
-							<dl class="divide-y divide-slate-100">
-								<div class="px-2 sm:px-6 py-4 grid grid-cols-3 gap-4 hover:bg-slate-50">
-									<dt class="text-sm font-medium text-slate-500">Jenjang Pendaftaran</dt>
-									<dd class="text-sm text-slate-900 font-bold col-span-2">{{ strtoupper($school_level) }}
-									</dd>
+						{{-- Info Grid --}}
+						<div class="grid grid-cols-1 gap-6">
+
+							{{-- 1. Data Personal --}}
+							<div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+								<div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+									<h3 class="font-bold text-slate-900 flex items-center gap-2 text-sm">
+										<span class="text-indigo-500">●</span> Identitas Calon Siswa
+									</h3>
+									<span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-lg text-xs font-bold uppercase tracking-wider">
+										{{ $school_level }}
+									</span>
 								</div>
-								<div class="px-2 sm:px-6 py-4 grid grid-cols-3 gap-4 hover:bg-slate-50">
-									<dt class="text-sm font-medium text-slate-500">Nama Lengkap</dt>
-									<dd class="text-sm text-slate-900 col-span-2">{{ $full_name }}</dd>
+								<div class="divide-y divide-slate-100 px-6">
+									<x-conf-row label="Nama Lengkap" :value="$full_name" />
+									<x-conf-row label="NISN" :value="$nisn" />
+									<x-conf-row label="Jenis Kelamin" :value="$gender" />
+									<x-conf-row label="TTL" :value="$place_of_birth . ', ' . \Carbon\Carbon::parse($date_of_birth)->isoFormat('D MMMM Y')" />
+									<x-conf-row label="Sekolah Asal" :value="$previous_school" />
 								</div>
-								<div class="px-2 sm:px-6 py-4 grid grid-cols-3 gap-4 hover:bg-slate-50">
-									<dt class="text-sm font-medium text-slate-500">Email</dt>
-									<dd class="text-sm text-slate-900 col-span-2">{{ $email }}</dd>
+							</div>
+
+							{{-- 2. Data Kontak & Keluarga --}}
+							<div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+								<div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+									<h3 class="font-bold text-slate-900 flex items-center gap-2 text-sm">
+										<span class="text-indigo-500">●</span> Kontak & Orang Tua
+									</h3>
 								</div>
-								<div class="px-2 sm:px-6 py-4 grid grid-cols-3 gap-4 hover:bg-slate-50">
-									<dt class="text-sm font-medium text-slate-500">No. HP</dt>
-									<dd class="text-sm text-slate-900 col-span-2">{{ $phone_number }}</dd>
+								<div class="divide-y divide-slate-100 px-6">
+									<x-conf-row label="Email" :value="$email" />
+									<x-conf-row label="No. WhatsApp" :value="$phone_number" />
+									<x-conf-row label="Nama Ayah" :value="$father_name" />
+									<x-conf-row label="Nama Ibu" :value="$mother_name" />
+									@if ($guardian_name)
+										<x-conf-row label="Nama Wali" :value="$guardian_name" />
+									@endif
 								</div>
-								<div class="px-2 sm:px-6 py-4 grid grid-cols-3 gap-4 hover:bg-slate-50">
-									<dt class="text-sm font-medium text-slate-500">Orang Tua</dt>
-									<dd class="text-sm text-slate-900 col-span-2">{{ $father_name }} & {{ $mother_name }}
-									</dd>
-								</div>
-							</dl>
+							</div>
 						</div>
 
-						<div class="flex items-start gap-3 p-4 bg-slate-50 rounded-xl">
-							<input id="confirm" type="checkbox" required
-								class="mt-1 h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600">
-							<label for="confirm" class="text-sm text-slate-600">
-								Saya menyatakan bahwa seluruh data yang saya isikan adalah benar dan dapat
-								dipertanggungjawabkan hukum. Saya bersedia menerima sanksi apabila ditemukan ketidaksesuaian
-								data di kemudian hari.
+						{{-- Agreement --}}
+						<div class="p-5 bg-slate-100 border border-slate-200 rounded-2xl hover:bg-slate-200/50 transition-colors">
+							<label class="flex items-start gap-4 cursor-pointer">
+								<input type="checkbox" required
+									class="mt-1 h-5 w-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-600">
+								<span class="text-sm text-slate-600 leading-relaxed">
+									Saya menyatakan dengan sadar bahwa seluruh data yang diisikan adalah <strong>benar dan sesuai dengan
+										aslinya</strong>. Jika di kemudian hari ditemukan ketidaksesuaian, saya bersedia menerima konsekuensi yang
+									ditetapkan pihak sekolah.
+								</span>
 							</label>
 						</div>
 					</div>
 				@endif
+
+				@error('submit')
+					<div class="mt-4 px-3 py-1.5 bg-red-100 border border-red-600 rounded-xl">
+						<p class="text-red-600 text-center">
+							{{ $message }}
+						</p>
+					</div>
+				@enderror
 
 				{{-- Navigation Buttons --}}
 				<div class="mt-10 pt-6 border-t border-slate-100 flex justify-between items-center">
@@ -530,7 +561,7 @@
 							</span>
 						</button>
 					@else
-						<button type="submit" wire:loading.attr="disabled"
+						<button type="submit" wire:loading.attr="disabled" wire:target="submit"
 							class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-sm font-bold rounded-full text-white bg-green-600 hover:bg-green-700 hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-70 disabled:cursor-not-allowed">
 
 							<span wire:loading.remove wire:target="submit" class="flex items-center justify-center gap-2">

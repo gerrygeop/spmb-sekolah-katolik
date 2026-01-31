@@ -33,7 +33,7 @@ enum RegistrationStatus: string implements HasLabel, HasColor
     public function getColor(): string
     {
         return match ($this) {
-            self::VERIFIKASI => 'warning',
+            self::VERIFIKASI => 'primary',
             self::PERBAIKAN => 'danger',
             self::PEMBAYARAN_TERTUNDA => 'warning',
             self::PEMBAYARAN_TERVERIFIKASI => 'success',
