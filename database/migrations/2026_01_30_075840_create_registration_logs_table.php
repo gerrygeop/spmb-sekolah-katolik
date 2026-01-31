@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('registration_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('registration_id')->constrained('registrations')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('user_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->string('from_status');
             $table->string('to_status');
             $table->string('description')->nullable();
