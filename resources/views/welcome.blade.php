@@ -5,7 +5,7 @@
 
 	<x-partials.education-level />
 
-	<x-partials.timeline />
+	<x-partials.timeline :timeline="$timeline" :batch="$batch" />
 
 	<x-partials.gallery />
 

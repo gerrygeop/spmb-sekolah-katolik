@@ -182,6 +182,9 @@ class RegistrationInfolist
                         Section::make('Informasi Pendaftaran')
                             ->columns(2)
                             ->schema([
+                                TextEntry::make('batch.name')
+                                    ->label('Periode Pendaftaran'),
+
                                 TextEntry::make('registration_code')
                                     ->label('Nomor Pendaftaran'),
 
@@ -191,8 +194,7 @@ class RegistrationInfolist
                                 TextEntry::make('total_amount')
                                     ->label('Total Biaya')
                                     ->money('IDR', true)
-                                    ->placeholder('-')
-                                    ->columnSpanFull(),
+                                    ->placeholder('-'),
 
                                 TextEntry::make('created_at')
                                     ->label('Tanggal mendaftar')

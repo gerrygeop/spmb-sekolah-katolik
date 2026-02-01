@@ -14,6 +14,7 @@ class Registration extends Model
     use HasFactory;
 
     protected $fillable = [
+        'registration_batch_id',
         'registration_code',
         'school_level',
         'status',
@@ -53,7 +54,7 @@ class Registration extends Model
 
     public function batch(): BelongsTo
     {
-        return $this->belongsTo(RegistrationBatch::class);
+        return $this->belongsTo(RegistrationBatch::class, 'registration_batch_id');
     }
 
     public function changeStatus(RegistrationStatus $toStatus, ?string $description = null, ?string $notes = null): void

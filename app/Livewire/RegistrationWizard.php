@@ -57,9 +57,21 @@ class RegistrationWizard extends Component
     public $payment;
     public $payment_proof;
 
+    public $batch;
+
     public function mount($code = null)
     {
         $this->documents = \App\Models\Document::all();
+        $batch = \App\Models\RegistrationBatch::query()
+            ->active()
+            ->first();
+
+        $this->batch = $batch?->id;
+
+        // Jika bukan mode edit dan tidak ada batch aktif, tolak akses
+        if (!$this->isEdit && !$this->batch) {
+            return redirect()->back();
+        }
 
         if ($code) {
             $registration = Registration::with(['student', 'parent', 'payment', 'documents'])->where('registration_code', $code)->firstOrFail();
@@ -191,8 +203,19 @@ class RegistrationWizard extends Component
     public function submit()
     {
         if ($this->isSubmitting) return;
-        $this->isSubmitting = true;
 
+        if (!$this->isEdit) {
+            $currentBatch = \App\Models\RegistrationBatch::query()->active()->first();
+            if (!$currentBatch) {
+                return redirect()
+                    ->back()
+                    ->withInput()
+                    ->with('submit', 'Pendaftaran telah ditutup saat Anda mengisi form.');
+            }
+            $this->batch = $currentBatch->id;
+        }
+
+        $this->isSubmitting = true;
         $this->validateStep($this->currentStep);
 
         try {
@@ -233,6 +256,7 @@ class RegistrationWizard extends Component
                 } else {
                     // Create New
                     $registration = Registration::create([
+                        'registration_batch_id' => $this->batch,
                         'registration_code' => 'REG-' . now()->format('Ymd') . '-' . Str::upper(Str::random(5)),
                         'school_level' => $this->school_level,
                         'status' => RegistrationStatus::PEMBAYARAN_TERTUNDA,

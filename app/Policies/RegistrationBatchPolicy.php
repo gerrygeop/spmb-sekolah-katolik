@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\UserRole;
 use App\Models\RegistrationBatch;
 use App\Models\User;
 use Illuminate\Auth\Access\Response;

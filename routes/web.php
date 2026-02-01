@@ -1,12 +1,11 @@
 <?php
 
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\RegistrationWizard;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', WelcomeController::class)->name("welcome");
 
 Route::get('/register', RegistrationWizard::class)->name('register');
 

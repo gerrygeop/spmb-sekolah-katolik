@@ -35,6 +35,14 @@ class RegistrationBatch extends Model
         });
     }
 
+    public function scopeActive($query)
+    {
+        return $query
+            ->where('is_active', true)
+            ->where('registration_start', '<=', now())
+            ->where('registration_end', '>=', now());
+    }
+
     public function registration(): HasMany
     {
         return $this->hasMany(Registration::class);
