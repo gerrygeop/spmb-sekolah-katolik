@@ -6,11 +6,11 @@ use App\Enums\RegistrationStatus;
 use App\Enums\UserRole;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Registration extends Model
 {
-    /** @use HasFactory<\Database\Factories\RegistrationFactory> */
     use HasFactory;
 
     protected $fillable = [
@@ -49,6 +49,11 @@ class Registration extends Model
     public function logs(): HasMany
     {
         return $this->hasMany(RegistrationLog::class);
+    }
+
+    public function batch(): BelongsTo
+    {
+        return $this->belongsTo(RegistrationBatch::class);
     }
 
     public function changeStatus(RegistrationStatus $toStatus, ?string $description = null, ?string $notes = null): void
