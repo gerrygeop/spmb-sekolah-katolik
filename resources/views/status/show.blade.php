@@ -53,67 +53,6 @@
 					</div>
 				</x-info-card>
 			</div>
-
-			{{-- Documents --}}
-			<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-				<div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-					<div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
-						<h3 class="font-bold text-slate-900 flex items-center gap-2">
-							📄 Dokumen Pendaftaran
-						</h3>
-					</div>
-
-					<div class="p-6 space-y-3">
-						@forelse ($registration->documents as $doc)
-							<div class="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
-								<div>
-									<p class="text-sm font-medium text-slate-800">
-										{{ $doc->document->name }}
-									</p>
-
-									@if ($doc->document->description)
-										<p class="text-xs text-slate-500">
-											{{ $doc->document->description }}
-										</p>
-									@endif
-								</div>
-
-								<a href="{{ Storage::url($doc->file_path) }}" target="_blank"
-									class="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 text-sm font-semibold">
-									Lihat
-									<svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24"
-										stroke="currentColor">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7-7 7M21 12H3" />
-									</svg>
-								</a>
-							</div>
-						@empty
-							<p class="text-sm text-slate-500 italic">
-								Belum ada dokumen yang diunggah.
-							</p>
-						@endforelse
-
-						@if ($registration->payment)
-							<div class="flex items-center justify-between py-2 border-b border-slate-100 last:border-0">
-								<div>
-									<p class="text-sm font-medium text-slate-800">
-										Bukti Pembayaran
-									</p>
-								</div>
-
-								<a href="{{ Storage::url($registration->payment->proof_file) }}" target="_blank"
-									class="inline-flex items-center gap-1 text-indigo-600 hover:text-indigo-800 text-sm font-semibold">
-									Lihat
-									<svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24"
-										stroke="currentColor">
-										<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7-7 7M21 12H3" />
-									</svg>
-								</a>
-							</div>
-						@endif
-					</div>
-				</div>
-			</div>
 		</div>
 	</div>
 

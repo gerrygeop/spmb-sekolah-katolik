@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->dateTime('registration_end');
             $table->json('timeline');
             $table->boolean('is_active')->default(false);
+            $table->decimal('registration_fee', 12, 2)->default(0);
             $table->text('description')->nullable();
             $table->timestamps();
             $table->softDeletes();

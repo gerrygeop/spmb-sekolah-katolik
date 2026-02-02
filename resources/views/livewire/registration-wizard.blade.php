@@ -2,7 +2,7 @@
 	<div class="max-w-4xl mx-auto">
 
 
-		@if ($batch)
+		@if ($batchId)
 			<div class="text-center mb-10">
 				<h1 class="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">Formulir Pendaftaran Online</h1>
 				<p class="text-slate-500 text-lg">Lengkapi data diri Anda untuk bergabung dengan kami.</p>

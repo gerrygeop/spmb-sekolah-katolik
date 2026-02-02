@@ -48,6 +48,7 @@ class DatabaseSeeder extends Seeder
             'registration_start' => $now->copy()->startOfDay(),
             'registration_end' => $now->copy()->addMonths(2)->endOfDay(),
             'is_active' => true,
+            'registration_fee' => 120000,
             'description' => 'Pendaftaran peserta didik baru tahun ajaran '
                 . $now->year . '/' . ($now->year + 1),
 

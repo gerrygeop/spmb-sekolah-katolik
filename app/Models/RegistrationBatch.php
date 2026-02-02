@@ -17,6 +17,7 @@ class RegistrationBatch extends Model
         'registration_end',
         'timeline',
         'is_active',
+        'registration_fee',
         'description',
     ];
 

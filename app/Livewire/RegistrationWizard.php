@@ -57,6 +57,7 @@ class RegistrationWizard extends Component
     public $payment_proof;
 
     public $batch;
+    public $batchId;
 
     public function mount($code = null)
     {
@@ -65,19 +66,13 @@ class RegistrationWizard extends Component
             ->active()
             ->first();
 
-        $this->batch = $batch?->id;
+        $this->batch = $batch;
+        $this->batchId = $batch?->id;
 
         // Jika bukan mode edit dan tidak ada batch aktif, tolak akses
-        if (!$this->isEdit && !$this->batch) {
+        if (!$this->isEdit && !$this->batchId) {
             return redirect()->back();
         }
-
-        // if (is_null($registration->payment)) {
-        //         $registration->changeStatus(
-        //             RegistrationStatus::PEMBAYARAN_TERTUNDA,
-        //             'Menunggu pendaftar upload bukti pembayaran'
-        //         );
-        //     }
 
         if ($code) {
             $registration = Registration::with(['student', 'parent', 'payment', 'documents'])->where('registration_code', $code)->firstOrFail();
@@ -217,7 +212,7 @@ class RegistrationWizard extends Component
                     ->withInput()
                     ->with('submit', 'Pendaftaran telah ditutup saat Anda mengisi form.');
             }
-            $this->batch = $currentBatch->id;
+            $this->batchId = $currentBatch->id;
         }
 
         $this->isSubmitting = true;

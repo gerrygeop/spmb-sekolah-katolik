@@ -74,19 +74,19 @@ class Registration extends Model
     }
 
     public static function createNew(
-        int $batchId,
+        RegistrationBatch $batch,
         string $schoolLevel,
         array $additionalData = []
     ): self {
         $registration = static::create(array_merge([
-            'registration_batch_id' => $batchId,
+            'registration_batch_id' => $batch->id,
             'registration_code' => 'REG-' . now()->format('Ymd') . '-' . Str::upper(Str::random(5)),
             'school_level' => $schoolLevel,
         ], $additionalData));
 
         // Set default values untuk field yang di-guard
         $registration->status = RegistrationStatus::PEMBAYARAN_TERTUNDA;
-        $registration->total_amount = 150000;
+        $registration->total_amount = $batch->registration_fee;
         $registration->save();
 
         return $registration;

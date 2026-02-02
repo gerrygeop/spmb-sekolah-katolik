@@ -39,7 +39,8 @@ class RegistrationBatchForm
 
                         TextInput::make('slug')
                             ->unique()
-                            ->required(),
+                            ->required()
+                            ->placeholder('Tidak perlu diisi'),
 
                         DateTimePicker::make('registration_start')
                             ->label('Tanggal buka pendaftaran')
@@ -48,8 +49,15 @@ class RegistrationBatchForm
                             ->label('Tanggal tutup pendaftaran')
                             ->required(),
 
+                        TextInput::make('registration_fee')
+                            ->label('Biaya Pendaftaran')
+                            ->numeric()
+                            ->minValue(0)
+                            ->required()
+                            ->columnSpanFull(),
+
                         Repeater::make('timeline')
-                            ->label('Jadwal Pendaftaran')
+                            ->label('Timeline Pendaftaran')
                             ->columns(3)
                             ->columnSpanFull()
                             ->schema([

@@ -24,7 +24,8 @@ class RegistrationBatchInfolist
                             ->columns(2)
                             ->schema([
                                 TextEntry::make('name')
-                                    ->label('Nama'),
+                                    ->label('Nama')
+                                    ->columnSpanFull(),
 
                                 TextEntry::make('registration_start')
                                     ->label('Tanggal buka pendaftaran')
@@ -37,6 +38,10 @@ class RegistrationBatchInfolist
                                     ->label('Aktif')
                                     ->boolean(),
 
+                                TextEntry::make('registration_fee')
+                                    ->label('Biaya Pendaftaran')
+                                    ->money('IDR', true),
+
                                 TextEntry::make('description')
                                     ->label('Keterangan')
                                     ->placeholder('-')
@@ -46,7 +51,7 @@ class RegistrationBatchInfolist
                         Section::make()
                             ->schema([
                                 RepeatableEntry::make('timeline')
-                                    ->label('Jadwal Pendaftaran')
+                                    ->label('Timeline Pendaftaran')
                                     ->schema([
                                         TextEntry::make('title')
                                             ->label('Tahapan/Kegiatan'),
