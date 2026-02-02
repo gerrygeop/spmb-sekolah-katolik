@@ -5,9 +5,12 @@ namespace App\Filament\Resources\Registrations\Tables;
 use App\Enums\RegistrationStatus;
 use App\Enums\SchoolLevel;
 use App\Enums\UserRole;
+use App\Filament\Exports\RegistrationExporter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ExportBulkAction;
+use Filament\Actions\Exports\Enums\ExportFormat;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -92,9 +95,12 @@ class RegistrationsTable
                 EditAction::make(),
             ])
             ->toolbarActions([
-                // BulkActionGroup::make([
-                //     DeleteBulkAction::make(),
-                // ]),
+                ExportBulkAction::make()
+                    ->exporter(RegistrationExporter::class)
+                    ->columnMappingColumns(2)
+                    ->formats([
+                        ExportFormat::Xlsx,
+                    ]),
             ]);
     }
 }

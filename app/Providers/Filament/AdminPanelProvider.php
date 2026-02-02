@@ -42,6 +42,7 @@ class AdminPanelProvider extends PanelProvider
                 AccountWidget::class,
                 // FilamentInfoWidget::class,
             ])
+            ->databaseNotifications()
             ->maxContentWidth(Width::Full)
             ->middleware([
                 EncryptCookies::class,
