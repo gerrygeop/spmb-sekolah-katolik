@@ -32,6 +32,11 @@ return new class extends Migration {
             $table->text('notes')->nullable();
             $table->decimal('total_amount', 12, 2)->default(0);
             $table->timestamps();
+
+            $table->index('school_level');
+            $table->index('status');
+            $table->index(['registration_batch_id', 'status']);
+            $table->index(['school_level', 'status']);
         });
     }
 

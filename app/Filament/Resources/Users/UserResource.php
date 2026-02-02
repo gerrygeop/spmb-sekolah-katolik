@@ -33,8 +33,9 @@ class UserResource extends Resource
                 Components\TextInput::make('name')
                     ->required(),
                 Components\TextInput::make('email')
-                    ->label('Email address')
+                    ->label('Email')
                     ->email()
+                    ->unique()
                     ->required(),
                 Components\TextInput::make('password')
                     ->password()

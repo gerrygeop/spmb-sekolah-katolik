@@ -62,4 +62,16 @@ class ViewRegistration extends ViewRecord
                 }),
         ];
     }
+
+    protected function resolveRecord($key): \App\Models\Registration
+    {
+        return \App\Models\Registration::with([
+            'student',
+            'parent',
+            'documents.document',
+            'payment',
+            'batch',
+            'logs.user'
+        ])->findOrFail($key);
+    }
 }

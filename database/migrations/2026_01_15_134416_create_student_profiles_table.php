@@ -24,6 +24,9 @@ return new class extends Migration
             $table->text('address');
             $table->string('previous_school')->nullable();
             $table->timestamps();
+
+            $table->index('full_name');
+            $table->index('phone_number');
         });
     }
 

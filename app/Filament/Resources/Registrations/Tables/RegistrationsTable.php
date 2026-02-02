@@ -3,7 +3,7 @@
 namespace App\Filament\Resources\Registrations\Tables;
 
 use App\Enums\RegistrationStatus;
-use App\Enums\SchooleLevel;
+use App\Enums\SchoolLevel;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -79,8 +79,8 @@ class RegistrationsTable
                 SelectFilter::make('school_level')
                     ->label('Jenjang Pendidikan')
                     ->options(
-                        collect(SchooleLevel::cases())
-                            ->mapWithKeys(fn(SchooleLevel $level) => [
+                        collect(SchoolLevel::cases())
+                            ->mapWithKeys(fn(SchoolLevel $level) => [
                                 $level->value => str()->upper($level->value)
                             ])
                     )

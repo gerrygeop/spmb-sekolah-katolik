@@ -4,7 +4,7 @@ namespace App\Enums;
 
 use Filament\Support\Contracts\HasLabel;
 
-enum SchooleLevel: string implements HasLabel
+enum SchoolLevel: string implements HasLabel
 {
     case SMP = 'smp';
     case SMA = 'sma';

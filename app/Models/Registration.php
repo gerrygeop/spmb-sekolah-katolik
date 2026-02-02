@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 class Registration extends Model
 {
@@ -17,13 +18,11 @@ class Registration extends Model
         'registration_batch_id',
         'registration_code',
         'school_level',
-        'status',
         'notes',
-        'total_amount',
     ];
 
     protected $casts = [
-        'school_level' => \App\Enums\SchooleLevel::class,
+        'school_level' => \App\Enums\SchoolLevel::class,
         'status' => \App\Enums\RegistrationStatus::class,
     ];
 
@@ -59,13 +58,12 @@ class Registration extends Model
 
     public function changeStatus(RegistrationStatus $toStatus, ?string $description = null, ?string $notes = null): void
     {
-        $fromStatus = $this->status;
+        $fromStatus = $this?->status;
         if ($fromStatus === $toStatus) return;
 
-        $this->update([
-            'status' => $toStatus,
-            'notes' => $notes,
-        ]);
+        $this->status = $toStatus;
+        $this->notes = $notes;
+        $this->save();
 
         $this->logs()->create([
             'user_id' => auth()->check() && auth()->user()->role === UserRole::ADMIN ? auth()->id() : null,
@@ -73,5 +71,24 @@ class Registration extends Model
             'to_status' => $toStatus,
             'description' => $description
         ]);
+    }
+
+    public static function createNew(
+        int $batchId,
+        string $schoolLevel,
+        array $additionalData = []
+    ): self {
+        $registration = static::create(array_merge([
+            'registration_batch_id' => $batchId,
+            'registration_code' => 'REG-' . now()->format('Ymd') . '-' . Str::upper(Str::random(5)),
+            'school_level' => $schoolLevel,
+        ], $additionalData));
+
+        // Set default values untuk field yang di-guard
+        $registration->status = RegistrationStatus::PEMBAYARAN_TERTUNDA;
+        $registration->total_amount = 150000;
+        $registration->save();
+
+        return $registration;
     }
 }

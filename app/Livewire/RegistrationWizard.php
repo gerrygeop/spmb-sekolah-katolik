@@ -8,7 +8,6 @@ use Livewire\WithFileUploads;
 use App\Models\Registration;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
@@ -73,10 +72,17 @@ class RegistrationWizard extends Component
             return redirect()->back();
         }
 
+        // if (is_null($registration->payment)) {
+        //         $registration->changeStatus(
+        //             RegistrationStatus::PEMBAYARAN_TERTUNDA,
+        //             'Menunggu pendaftar upload bukti pembayaran'
+        //         );
+        //     }
+
         if ($code) {
             $registration = Registration::with(['student', 'parent', 'payment', 'documents'])->where('registration_code', $code)->firstOrFail();
 
-            abort_if($registration->status !== RegistrationStatus::PERBAIKAN, 403, 'Pendaftaran tidak dapat diedit saat ini.');
+            abort_if($registration->status !== RegistrationStatus::PERBAIKAN, 403);
 
             foreach ($registration->documents as $doc) {
                 $this->existingDocuments[$doc->document_id] = $doc->file_path;
@@ -168,21 +174,20 @@ class RegistrationWizard extends Component
 
             foreach ($this->documents as $document) {
                 $key = "uploadedDocuments.{$document->id}";
-
-                $hasExistingFile = $this->isEdit
-                    && in_array($document->id, $this->existingDocumentIds);
+                $hasExistingFile = $this->isEdit && in_array($document->id, $this->existingDocumentIds);
+                $documentRules = ['file', 'mimes:pdf,jpg,jpeg,png', 'max:2048'];
 
                 if ($document->is_required && !$hasExistingFile) {
-                    $rules[$key] = 'required|file|mimes:pdf,jpg,jpeg,png|max:2048';
+                    array_unshift($documentRules, 'required');
                 } else {
-                    $rules[$key] = 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048';
+                    array_unshift($documentRules, 'nullable');
                 }
+
+                $rules[$key] = $documentRules;
             }
 
             if ($this->isEdit) {
-                $this->validate([
-                    'payment_proof' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048'
-                ]);
+                $rules['payment_proof'] = 'nullable|file|mimes:jpg,jpeg,png,pdf|max:2048';
             }
 
             $this->validate($rules);
@@ -255,13 +260,10 @@ class RegistrationWizard extends Component
                     ]);
                 } else {
                     // Create New
-                    $registration = Registration::create([
-                        'registration_batch_id' => $this->batch,
-                        'registration_code' => 'REG-' . now()->format('Ymd') . '-' . Str::upper(Str::random(5)),
-                        'school_level' => $this->school_level,
-                        'status' => RegistrationStatus::PEMBAYARAN_TERTUNDA,
-                        'total_amount' => 150000,
-                    ]);
+                    $registration = Registration::createNew(
+                        $this->batch,
+                        $this->school_level
+                    );
 
                     $registration->student()->create([
                         'full_name' => $this->full_name,
@@ -307,16 +309,19 @@ class RegistrationWizard extends Component
                     );
                 }
 
+                // Bukti pembayaran
                 if ($this->payment_proof && $this->isEdit) {
-                    if ($registration->payment && $registration->payment->proof_file) {
-                        Storage::disk('public')->delete($registration->payment->proof_file);
-                    }
-
                     $path = $this->payment_proof->store('payment-proofs', 'public');
+                    $oldPath = $registration->payment?->proof_file;
 
-                    $registration->payment()->update([
-                        'proof_file' => $path,
-                    ]);
+                    $registration->payment()->updateOrCreate(
+                        ['registration_id' => $registration->id],
+                        ['proof_file' => $path]
+                    );
+
+                    if ($oldPath) {
+                        Storage::disk('public')->delete($oldPath);
+                    }
                 }
 
                 return $registration;
