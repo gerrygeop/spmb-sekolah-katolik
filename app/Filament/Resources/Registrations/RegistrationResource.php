@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Registrations;
 
+use App\Enums\SchoolLevel;
+use App\Enums\UserRole;
 use App\Filament\Resources\Registrations\Pages\CreateRegistration;
 use App\Filament\Resources\Registrations\Pages\EditRegistration;
 use App\Filament\Resources\Registrations\Pages\ListRegistrations;
@@ -15,6 +17,7 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class RegistrationResource extends Resource
 {
@@ -56,5 +59,19 @@ class RegistrationResource extends Resource
             'view' => ViewRegistration::route('/{record}'),
             'edit' => EditRegistration::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery()->with(['student']);
+        $user = auth()->user();
+
+        if (!$user) return $query;
+
+        return match ($user->role) {
+            UserRole::ADMIN_SMA => $query->where('school_level', SchoolLevel::SMA),
+            UserRole::ADMIN_SMP => $query->where('school_level', SchoolLevel::SMP),
+            default => $query,
+        };
     }
 }

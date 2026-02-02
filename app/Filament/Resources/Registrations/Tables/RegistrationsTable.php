@@ -4,6 +4,7 @@ namespace App\Filament\Resources\Registrations\Tables;
 
 use App\Enums\RegistrationStatus;
 use App\Enums\SchoolLevel;
+use App\Enums\UserRole;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -78,6 +79,7 @@ class RegistrationsTable
 
                 SelectFilter::make('school_level')
                     ->label('Jenjang Pendidikan')
+                    ->visible(auth()->user()->role === UserRole::ADMIN)
                     ->options(
                         collect(SchoolLevel::cases())
                             ->mapWithKeys(fn(SchoolLevel $level) => [
