@@ -6,32 +6,138 @@
 
 <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
 	<div class="bg-linear-to-r from-slate-900 to-slate-800 px-6 py-8 md:px-10 text-white">
-		<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+		<div class="flex flex-col md:flex-row justify-between items-start gap-6 relative z-10">
 			<div>
-				<h1 class="text-2xl font-semibold">
+				<h1 class="text-xl md:text-2xl font-semibold leading-tight">
 					{{ $registration->student->full_name ?? 'Calon Siswa' }}
 				</h1>
-				<h5 class="text-slate-400 mt-1">
-					NISN {{ $registration->student->nisn ?? '-' }}
+				<h5 class="text-slate-400 text-sm md:text-base mt-1">
+					NISN <span class="font-mono text-slate-300">{{ $registration->student->nisn ?? '-' }}</span>
 				</h5>
 			</div>
-			<div class="text-left md:text-right">
-				<div class="text-xs text-slate-400 uppercase tracking-wider mb-2">Kode Pendaftaran</div>
-				<div class="text-2xl text-yellow-400 font-mono font-bold flex items-center justify-end gap-3">
-					<span>{{ $registration->registration_code }}</span>
-					<button onclick="copyToClipboard('{{ $registration->registration_code }}')" title="Salin"
-						class="transition-colors text-yellow-500 hover:text-yellow-400 p-1 hover:bg-slate-600 rounded-lg">
-						<svg xmlns="http://www.w3.org/2000/svg" class="size-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-								d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
-						</svg>
-					</button>
+
+			<div class="w-full md:w-auto flex flex-col md:items-end gap-4">
+				@php
+					$steps = $registration->batch->timeline ?? [];
+					$currentStatus = $registration->status;
+					$currentStepIndex = 0;
+					$progressPercentage = 0;
+					$statusLabel = 'Menunggu Proses';
+
+					if ($currentStatus === $statusEnum::PEMBAYARAN_TERTUNDA) {
+					    $currentStepIndex = 0;
+					    $progressPercentage = 20;
+					    $statusLabel = 'Menunggu Pembayaran';
+					} elseif ($currentStatus === $statusEnum::VERIFIKASI || $currentStatus === $statusEnum::PERBAIKAN) {
+					    $currentStepIndex = 1;
+					    $progressPercentage = 40;
+					    $statusLabel = 'Menunggu Verifikasi';
+					} elseif ($currentStatus === $statusEnum::TERVERIFIKASI) {
+					    $currentStepIndex = 2;
+					    $progressPercentage = 60;
+					    $statusLabel = 'Siap Tes Masuk';
+					} elseif ($currentStatus === $statusEnum::TIDAK_LULUS) {
+					    $currentStepIndex = 3;
+					    $progressPercentage = 100;
+					    $statusLabel = 'Selesai';
+					} elseif ($currentStatus === $statusEnum::LULUS || $currentStatus === $statusEnum::CADANGAN) {
+					    $currentStepIndex = 4;
+					    $progressPercentage = 80; // or 100?
+					    if ($currentStatus === $statusEnum::LULUS) {
+					        $statusLabel = 'Daftar Ulang';
+					    } else {
+					        $statusLabel = 'Cadangan';
+					    }
+					}
+				@endphp
+
+				<div class="flex flex-col gap-4">
+					{{-- Registration Code --}}
+					<div class="flex flex-col md:items-end">
+						<div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Kode Pendaftaran</div>
+						<div class="text-2xl md:text-2xl text-yellow-400 font-mono font-bold flex items-center gap-3">
+							<span>{{ $registration->registration_code }}</span>
+							<button onclick="copyToClipboard('{{ $registration->registration_code }}')" title="Salin"
+								class="transition-colors text-yellow-500 hover:text-yellow-400 p-1 hover:bg-slate-600 rounded-lg">
+								<svg xmlns="http://www.w3.org/2000/svg" class="size-5 md:size-6" fill="none" viewBox="0 0 24 24"
+									stroke="currentColor">
+									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+										d="M8 7v8a2 2 0 002 2h6M8 7V5a2 2 0 012-2h4.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V15a2 2 0 01-2 2h-2M8 7H6a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2v-2" />
+								</svg>
+							</button>
+						</div>
+
+						<p class="text-sm text-slate-400 mt-2 italic">
+							*Simpan Kode Pendaftaran ini untuk pengecekan status selanjutnya.
+						</p>
+					</div>
 				</div>
-				<p class="text-sm text-slate-300 tracking-wide mt-2">
-					Harap simpan kode pendaftaran ini untuk digunakan saat proses pendaftaran.
-				</p>
 			</div>
 		</div>
+
+		{{-- Timeline Stepper --}}
+		@if (count($steps) > 0)
+			<div class="mt-12 mb-4 relative z-10">
+				<div class="text-xs text-slate-400 mb-2">Update terakhir:
+					{{ $registration->updated_at->translatedFormat('d F Y H:i') }} WIB
+				</div>
+
+				{{-- Mobile Scroll Wrapper --}}
+				<div class="overflow-x-auto pt-2 pb-8 -mx-6 px-6 md:overflow-visible md:pb-0 md:mx-0 md:px-0 scrollbar-hide">
+					<div class="relative flex justify-between min-w-150 md:min-w-0 md:w-full">
+						{{-- Connecting Line Background --}}
+						<div class="absolute top-3.75 left-0 w-full h-1 bg-slate-700/50 rounded-full -z-10"></div>
+
+						{{-- Connecting Line Progress --}}
+						@php
+							$lineProgress = 0;
+							if (count($steps) > 1) {
+							    $lineProgress = ($currentStepIndex / (count($steps) - 1)) * 100;
+							}
+						@endphp
+						<div class="absolute top-3.75 left-0 h-1 bg-yellow-400 rounded-full -z-10 transition-all duration-1000 ease-out"
+							style="width: {{ $lineProgress }}%"></div>
+
+						@foreach ($steps as $index => $step)
+							@php
+								$isActive = $index === $currentStepIndex;
+								$isCompleted = $index < $currentStepIndex;
+								$isFuture = $index > $currentStepIndex;
+							@endphp
+							<div class="flex flex-col items-center group cursor-default w-32 relative">
+								{{-- Step Circle --}}
+								<div
+									class="w-8 h-8 rounded-full flex items-center justify-center border-2 z-10 transition-all duration-300 {{ $isCompleted ? 'bg-yellow-400 border-yellow-400 text-slate-900' : '' }} {{ $isActive ? 'bg-slate-800 border-yellow-400 text-yellow-400 scale-110' : '' }} {{ $isFuture ? 'bg-slate-800 border-slate-600 text-slate-500' : '' }} ">
+									@if ($isCompleted)
+										<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+											<path fill-rule="evenodd"
+												d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+												clip-rule="evenodd" />
+										</svg>
+									@else
+										<span class="text-xs font-bold">{{ $index + 1 }}</span>
+									@endif
+								</div>
+
+								{{-- Step Title --}}
+								<div
+									class="mt-3 text-center transition-colors duration-300 {{ $isActive || $isCompleted ? 'text-white' : 'text-slate-500' }}">
+									<p class="text-[10px] uppercase font-bold tracking-wider mb-0.5">{{ $step['title'] }}</p>
+
+									{{-- Date --}}
+									@if (isset($step['start_date']))
+										<p class="text-[9px] font-medium opacity-70">
+											{{ \Carbon\Carbon::parse($step['start_date'])->translatedFormat('d F Y') }}
+										</p>
+									@endif
+								</div>
+							</div>
+						@endforeach
+					</div>
+				</div>
+			</div>
+		@endif
+
 	</div>
 
 	{{-- Status Section --}}
@@ -55,11 +161,13 @@
 							Tagihan Pendaftaran
 						</h3>
 						<p class="text-amber-700/80 text-sm leading-relaxed mt-1">
-							Segera lakukan transfer untuk mengamankan slot pendaftaran Anda.
+							Mohon selesaikan pembayaran untuk melanjutkan ke tahap verifikasi berkas.
 						</p>
 					</div>
 					<div class="flex flex-col">
-						<span class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1">Total Biaya</span>
+						<span class="text-[10px] font-black text-amber-600 uppercase tracking-widest mb-1">
+							Total Biaya
+						</span>
 						<span class="text-4xl font-black text-amber-800 tracking-tighter leading-none">
 							Rp {{ number_format($registration->total_amount, 0, ',', '.') }}
 						</span>
@@ -145,8 +253,8 @@
 							</h3>
 						</div>
 						<p class="text-sm font-bold text-blue-800/80 leading-relaxed max-w-2xl">
-							Dokumen dan/atau bukti pembayaran yang Anda kirimkan sedang kami tinjau.
-							Mohon menunggu sebentar, pembaruan status akan kami informasikan setelah proses verifikasi selesai.
+							Kami sedang memverifikasi dokumen dan bukti pembayaran Anda.
+							Proses ini biasanya memakan waktu 1-2 hari kerja. Mohon cek halaman ini secara berkala.
 						</p>
 					</div>
 
@@ -169,14 +277,16 @@
 			<div class="p-8">
 				<div class="flex items-center gap-4 mb-6">
 					<div class="bg-emerald-500 text-white p-2 rounded-full shadow-lg shadow-emerald-200">
-						<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+						<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+							stroke="currentColor">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
 						</svg>
 					</div>
 					<div>
 						<h3 class="text-xl font-black text-indigo-950 tracking-tight leading-none">Data Terverifikasi</h3>
 						<p class="text-sm text-indigo-700/80 mt-1 font-medium">
-							Data Anda telah diverifikasi. Berikut adalah detail jadwal seleksi Anda:
+							Selamat! Berkas Anda telah terverifikasi. Anda berhak mengikuti Tes Seleksi sesuai jadwal
+							berikut:
 						</p>
 					</div>
 				</div>
@@ -275,7 +385,7 @@
 							</svg>
 						</div>
 						<h4 class="text-slate-800 font-bold text-base">Jadwal Belum Tersedia</h4>
-						<p class="text-slate-500 text-sm max-w-70 mt-1">
+						<p class="text-slate-500 text-sm max-w-lg mt-1">
 							Jadwal seleksi Anda akan segera diinformasikan. Harap cek kembali halaman ini secara berkala.
 						</p>
 					</div>
@@ -300,9 +410,10 @@
 				<div class="grow space-y-2">
 					<h3 class="text-lg font-black text-red-900 uppercase tracking-tight">Perlu Perbaikan Data</h3>
 					<div class="bg-white/60 rounded-xl p-4 border border-red-100">
-						<p class="text-[10px] font-black text-red-400 uppercase tracking-widest mb-1">Catatan Admin:</p>
+						<p class="text-[10px] font-black text-red-400 uppercase tracking-widest mb-1">Catatan Verifikator:
+						</p>
 						<p class="font-semibold text-red-800 leading-relaxed">
-							"{{ $registration->notes ?? 'Mohon periksa kembali kelengkapan berkas Anda.' }}"
+							"{{ $registration->notes ?? 'Terdapat data yang belum lengkap atau tidak sesuai. Silakan perbaiki segera.' }}"
 						</p>
 					</div>
 				</div>
@@ -310,7 +421,7 @@
 				<div class="w-full md:w-auto">
 					<a href="{{ route('registration.edit', ['code' => $registration->registration_code]) }}"
 						class="group flex items-center justify-center gap-3 px-8 py-4 bg-red-600 hover:bg-red-700 text-white font-black text-xs uppercase tracking-[0.15em] rounded-2xl transition-all shadow-lg shadow-red-600/20 active:scale-95">
-						Perbaiki Sekarang
+						Perbarui Data
 						<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform group-hover:translate-x-1 transition-transform"
 							fill="none" viewBox="0 0 24 24" stroke="currentColor">
 							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M14 5l7 7-7 7M21 12H3" />
@@ -343,9 +454,9 @@
 						Selamat, Anda Lulus!
 					</h3>
 					<p class="text-sm text-emerald-800/80 leading-relaxed max-w-xl">
-						Selamat! Anda dinyatakan Lulus di <span class="font-bold">{{ $registration->school_level->getLabel() }}
-							Sekolah Katolik</span>. Langkah selanjutnya
-						adalah melakukan proses daftar ulang dan melakukan pembayaran.
+						Selamat bergabung! Anda dinyatakan <span class="font-bold">DITERIMA</span> di
+						{{ $registration->school_level->getLabel() }} Sekolah Katolik.
+						Silakan selesaikan proses Daftar Ulang untuk meresmikan status siswa Anda.
 					</p>
 				</div>
 
@@ -378,13 +489,13 @@
 							Informasi Hasil Seleksi
 						</h3>
 						<p class="text-sm font-bold text-slate-600 leading-relaxed max-w-2xl">
-							Terima kasih atas minat dan partisipasi Anda dalam proses seleksi kami. Setelah melalui pertimbangan yang
-							matang, kami menyesal menginformasikan bahwa saat ini Anda <span
-								class="text-slate-900 underline decoration-slate-300 decoration-2 underline-offset-4">belum dapat
-								bergabung</span> bersama kami.
+							Terima kasih telah mengikuti seluruh rangkaian seleksi.
+							Mohon maaf, berdasarkan hasil tes dan kuota yang tersedia, saat ini Anda
+							<span class="text-slate-900 underline decoration-slate-300 decoration-2 underline-offset-4">belum
+								dapat diterima</span>.
 						</p>
 						<p class="text-sm font-black text-slate-500 uppercase tracking-widest">
-							Tetap semangat dan sukses untuk perjalanan akademik Anda di tempat lain.
+							Jangan berkecil hati. Tetap semangat dan sukses untuk pendidikan Anda selanjutnya.
 						</p>
 					</div>
 				</div>
@@ -407,11 +518,11 @@
 
 					<div class="grow space-y-2">
 						<h3 class="text-xl font-black text-amber-900 uppercase tracking-tight flex items-center gap-3">
-							Anda masuk dalam daftar cadangan
+							Anda Masuk Daftar Cadangan
 						</h3>
 						<p class="text-sm font-bold text-amber-800/80 leading-relaxed max-w-2xl">
-							Saat ini, Anda berada dalam daftar cadangan penerimaan siswa baru. Kami akan menghubungi Anda
-							jika ada slot yang tersedia. Terima kasih atas kesabaran dan pengertian Anda.
+							Hasil seleksi Anda memenuhi kriteria namun kuota saat ini telah penuh.
+							Kami akan segera menghubungi Anda apabila terdapat kursi yang tersedia.
 						</p>
 					</div>
 				</div>
@@ -419,12 +530,15 @@
 				<div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-amber-200/50 pt-6">
 					<div class="flex items-center gap-3">
 						<div class="w-1.5 h-1.5 bg-amber-400 rounded-full"></div>
-						<p class="text-[11px] font-bold text-amber-700 uppercase tracking-wider">Update Terakhir:
-							{{ now()->format('d M Y') }}</p>
+						<p class="text-[11px] font-bold text-amber-700 uppercase tracking-wider">
+							Update Terakhir: {{ now()->format('d M Y') }}
+						</p>
 					</div>
 					<div class="flex items-center gap-3">
 						<div class="w-1.5 h-1.5 bg-amber-400 rounded-full"></div>
-						<p class="text-[11px] font-bold text-amber-700 uppercase tracking-wider">Periode Tunggu: 7 Hari Kerja</p>
+						<p class="text-[11px] font-bold text-amber-700 uppercase tracking-wider">
+							Periode Tunggu: 7 Hari Kerja
+						</p>
 					</div>
 				</div>
 			</div>
