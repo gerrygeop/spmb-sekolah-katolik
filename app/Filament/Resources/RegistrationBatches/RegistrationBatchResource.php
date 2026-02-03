@@ -17,6 +17,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use UnitEnum;
 
 class RegistrationBatchResource extends Resource
 {
@@ -24,6 +25,7 @@ class RegistrationBatchResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedAcademicCap;
 
+    protected static string | UnitEnum | null $navigationGroup = 'Kelola SPMB';
     protected static ?string $recordTitleAttribute = 'name';
     protected static ?string $navigationLabel = 'Periode Pendaftaran';
     protected static ?string $label = 'Periode Pendaftaran';

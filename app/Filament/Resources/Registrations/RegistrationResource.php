@@ -18,6 +18,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
 
 class RegistrationResource extends Resource
 {
@@ -25,6 +26,7 @@ class RegistrationResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
 
+    protected static string | UnitEnum | null $navigationGroup = 'Kelola SPMB';
     protected static ?string $recordTitleAttribute = 'registration_code';
     protected static ?string $navigationLabel = 'Pendaftaran';
     protected static ?string $label = 'Pendaftaran';
