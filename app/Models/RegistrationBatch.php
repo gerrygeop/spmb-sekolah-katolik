@@ -48,4 +48,9 @@ class RegistrationBatch extends Model
     {
         return $this->hasMany(Registration::class);
     }
+
+    public function selectionSchedules(): HasMany
+    {
+        return $this->hasMany(SelectionSchedule::class);
+    }
 }

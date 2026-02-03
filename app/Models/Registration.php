@@ -56,6 +56,11 @@ class Registration extends Model
         return $this->belongsTo(RegistrationBatch::class, 'registration_batch_id');
     }
 
+    public function getSelectionScheduleAttribute()
+    {
+        return $this->batch?->selectionSchedules()->first();
+    }
+
     public function changeStatus(RegistrationStatus $toStatus, ?string $description = null, ?string $notes = null): void
     {
         $fromStatus = $this?->status;
