@@ -2,6 +2,7 @@
 
 namespace App\Filament\Widgets;
 
+use App\Enums\RegistrationStatus;
 use App\Models\Registration;
 use App\Models\RegistrationBatch;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
@@ -29,15 +30,20 @@ class RegistrationStatsOverview extends StatsOverviewWidget
                 ->descriptionIcon('heroicon-m-user-group')
                 ->color('info'),
 
-            Stat::make('Menunggu Verifikasi', $query->where('status', 'pending')->count())
+            Stat::make('Menunggu Verifikasi', $query->where('status', RegistrationStatus::VERIFIKASI)->count())
                 ->description('Perlu segera diperiksa')
                 ->descriptionIcon('heroicon-m-clock')
                 ->color('warning'),
 
-            Stat::make('Selesai/Lulus', $query->where('status', 'verified')->count())
+            Stat::make('Terverifikasi', $query->where('status', RegistrationStatus::TERVERIFIKASI)->count())
                 ->description('Data siap seleksi')
                 ->descriptionIcon('heroicon-m-check-badge')
                 ->color('success'),
         ];
+    }
+
+    public function getColumns(): int | array
+    {
+        return 3;
     }
 }

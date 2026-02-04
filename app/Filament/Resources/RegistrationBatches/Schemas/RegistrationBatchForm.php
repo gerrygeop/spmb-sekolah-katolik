@@ -8,6 +8,7 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities;
 use Filament\Schemas\Schema;
@@ -19,59 +20,69 @@ class RegistrationBatchForm
         return $schema
             ->columns(3)
             ->components([
-                Section::make()
-                    ->columns(2)
+                Group::make()
                     ->columnSpan(2)
                     ->schema([
-                        TextInput::make('name')
-                            ->label('Nama')
-                            ->placeholder('Contoh: Penerimaan Murid Baru 2026/2027')
-                            ->autofocus()
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(function (Utilities\Get $get, Utilities\Set $set, ?string $old, ?string $state) {
-                                if (($get('slug') ?? '') !== str()->slug($old)) {
-                                    return;
-                                }
-
-                                $set('slug', str()->slug($state));
-                            })
-                            ->required(),
-
-                        TextInput::make('slug')
-                            ->unique()
-                            ->required()
-                            ->placeholder('Tidak perlu diisi'),
-
-                        DateTimePicker::make('registration_start')
-                            ->label('Tanggal buka pendaftaran')
-                            ->required(),
-                        DateTimePicker::make('registration_end')
-                            ->label('Tanggal tutup pendaftaran')
-                            ->required(),
-
-                        TextInput::make('registration_fee')
-                            ->label('Biaya Pendaftaran')
-                            ->numeric()
-                            ->minValue(0)
-                            ->required()
-                            ->columnSpanFull(),
-
-                        Repeater::make('timeline')
-                            ->label('Timeline Pendaftaran')
-                            ->columns(3)
+                        Section::make()
+                            ->columns(2)
                             ->columnSpanFull()
                             ->schema([
-                                TextInput::make('title')
-                                    ->label('Tahapan/Kegiatan')
+                                TextInput::make('name')
+                                    ->label('Nama')
+                                    ->placeholder('Contoh: Penerimaan Murid Baru 2026/2027')
+                                    ->autofocus()
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(function (Utilities\Get $get, Utilities\Set $set, ?string $old, ?string $state) {
+                                        if (($get('slug') ?? '') !== str()->slug($old)) {
+                                            return;
+                                        }
+
+                                        $set('slug', str()->slug($state));
+                                    })
                                     ->required(),
-                                DatePicker::make('start_date')
-                                    ->label('Tanggal Mulai')
+
+                                TextInput::make('slug')
+                                    ->unique()
+                                    ->required()
+                                    ->placeholder('Tidak perlu diisi'),
+
+                                DateTimePicker::make('registration_start')
+                                    ->label('Tanggal buka pendaftaran')
                                     ->required(),
-                                DatePicker::make('end_date')
-                                    ->label('Tanggal Selesai'),
-                            ])
-                            ->addActionLabel('Tambah Item')
-                            ->required(),
+                                DateTimePicker::make('registration_end')
+                                    ->label('Tanggal tutup pendaftaran')
+                                    ->required(),
+
+                                TextInput::make('registration_fee')
+                                    ->label('Biaya Pendaftaran')
+                                    ->numeric()
+                                    ->minValue(0)
+                                    ->required()
+                                    ->columnSpanFull(),
+                            ]),
+
+                        Section::make('Timeline Pendaftaran')
+                            ->columns(2)
+                            ->columnSpanFull()
+                            ->collapsible()
+                            ->schema([
+                                Repeater::make('timeline')
+                                    ->hiddenLabel()
+                                    ->columns(3)
+                                    ->columnSpanFull()
+                                    ->schema([
+                                        TextInput::make('title')
+                                            ->label('Tahapan/Kegiatan')
+                                            ->required(),
+                                        DatePicker::make('start_date')
+                                            ->label('Tanggal Mulai')
+                                            ->required(),
+                                        DatePicker::make('end_date')
+                                            ->label('Tanggal Selesai'),
+                                    ])
+                                    ->addActionLabel('Tambah Item')
+                                    ->required(),
+                            ]),
                     ]),
 
                 Section::make('Status')

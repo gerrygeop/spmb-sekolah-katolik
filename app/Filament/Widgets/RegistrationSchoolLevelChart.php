@@ -27,7 +27,7 @@ class RegistrationSchoolLevelChart extends ChartWidget
         $data = $query->selectRaw('school_level, count(*) as count')
             ->groupBy('school_level')
             ->pluck('count', 'school_level');
-
+        // dd($data);
         return [
             'datasets' => [
                 [
@@ -36,7 +36,7 @@ class RegistrationSchoolLevelChart extends ChartWidget
                     'backgroundColor' => ['#6366f1', '#f59e0b'], // Indigo untuk SMP, Amber untuk SMA
                 ],
             ],
-            'labels' => $data->keys()->toArray(),
+            'labels' => $data->keys()->map(fn($key) => str($key)->upper())->toArray(),
         ];
     }
 

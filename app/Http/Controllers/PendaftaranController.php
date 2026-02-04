@@ -32,6 +32,8 @@ class PendaftaranController extends Controller
     {
         $valid = $request->validate([
             'registration_code' => 'required|exists:registrations,registration_code'
+        ], [
+            'registration_code.exists' => 'Nomor Pendaftaran tidak ditemukan'
         ]);
 
         return to_route('status.show', ['code' => $valid['registration_code']]);

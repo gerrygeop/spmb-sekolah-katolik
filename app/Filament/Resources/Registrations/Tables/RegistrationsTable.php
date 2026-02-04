@@ -6,6 +6,7 @@ use App\Enums\RegistrationStatus;
 use App\Enums\SchoolLevel;
 use App\Enums\UserRole;
 use App\Filament\Exports\RegistrationExporter;
+use App\Models\RegistrationBatch;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -24,6 +25,7 @@ class RegistrationsTable
             ->columns([
                 TextColumn::make('registration_code')
                     ->label('Nomor Pendaftaran')
+                    ->disabledClick()
                     ->sortable()
                     ->searchable(),
 
@@ -79,6 +81,12 @@ class RegistrationsTable
                                 $status->value => $status->getLabel()
                             ])
                     ),
+
+                SelectFilter::make('registration_batch_id')
+                    ->label('Periode/Gelombang')
+                    ->options(RegistrationBatch::pluck('name', 'id'))
+                    ->default(fn() => RegistrationBatch::query()->active()->first()?->id)
+                    ->selectablePlaceholder(false),
 
                 SelectFilter::make('school_level')
                     ->label('Jenjang Pendidikan')

@@ -21,33 +21,17 @@
 					$steps = $registration->batch->timeline ?? [];
 					$currentStatus = $registration->status;
 					$currentStepIndex = 0;
-					$progressPercentage = 0;
-					$statusLabel = 'Menunggu Proses';
 
 					if ($currentStatus === $statusEnum::PEMBAYARAN_TERTUNDA) {
 					    $currentStepIndex = 0;
-					    $progressPercentage = 20;
-					    $statusLabel = 'Menunggu Pembayaran';
 					} elseif ($currentStatus === $statusEnum::VERIFIKASI || $currentStatus === $statusEnum::PERBAIKAN) {
 					    $currentStepIndex = 1;
-					    $progressPercentage = 40;
-					    $statusLabel = 'Menunggu Verifikasi';
 					} elseif ($currentStatus === $statusEnum::TERVERIFIKASI) {
 					    $currentStepIndex = 2;
-					    $progressPercentage = 60;
-					    $statusLabel = 'Siap Tes Masuk';
 					} elseif ($currentStatus === $statusEnum::TIDAK_LULUS) {
 					    $currentStepIndex = 3;
-					    $progressPercentage = 100;
-					    $statusLabel = 'Selesai';
 					} elseif ($currentStatus === $statusEnum::LULUS || $currentStatus === $statusEnum::CADANGAN) {
 					    $currentStepIndex = 4;
-					    $progressPercentage = 80; // or 100?
-					    if ($currentStatus === $statusEnum::LULUS) {
-					        $statusLabel = 'Daftar Ulang';
-					    } else {
-					        $statusLabel = 'Cadangan';
-					    }
 					}
 				@endphp
 
