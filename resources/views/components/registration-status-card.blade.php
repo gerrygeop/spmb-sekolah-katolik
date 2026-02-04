@@ -35,14 +35,14 @@
 					}
 				@endphp
 
-				<div class="flex flex-col gap-4">
+				<div class="flex flex-col gap-4 relative">
 					{{-- Registration Code --}}
 					<div class="flex flex-col md:items-end">
 						<div class="text-xs text-slate-400 uppercase tracking-wider mb-1">Kode Pendaftaran</div>
 						<div class="text-2xl md:text-2xl text-yellow-400 font-mono font-bold flex items-center gap-3">
 							<span>{{ $registration->registration_code }}</span>
 							<button onclick="copyToClipboard('{{ $registration->registration_code }}')" title="Salin"
-								class="transition-colors text-yellow-500 hover:text-yellow-400 p-1 hover:bg-slate-600 rounded-lg">
+								class="transition-colors text-yellow-500 cursor-pointer active:bg-indigo-700 hover:text-yellow-400 p-1 hover:bg-slate-600 rounded-lg">
 								<svg xmlns="http://www.w3.org/2000/svg" class="size-5 md:size-6" fill="none" viewBox="0 0 24 24"
 									stroke="currentColor">
 									<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -55,6 +55,15 @@
 							*Simpan Kode Pendaftaran ini untuk pengecekan status selanjutnya.
 						</p>
 					</div>
+				</div>
+
+				<div id="copy-toast"
+					class="absolute top-0 right-8 bg-yellow-500/80 text-slate-800 px-6 py-3 rounded-xl shadow-2xl translate-y-20 opacity-0 transform transition-all duration-300 z-50 flex items-center gap-2">
+					<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-400" fill="none" viewBox="0 0 24 24"
+						stroke="currentColor">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+					</svg>
+					<span class="text-sm font-medium">Nomor pendaftaran berhasil disalin</span>
 				</div>
 			</div>
 		</div>

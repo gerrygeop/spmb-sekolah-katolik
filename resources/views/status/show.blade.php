@@ -60,7 +60,15 @@
 		<script>
 			function copyToClipboard(text) {
 				navigator.clipboard.writeText(text).then(() => {
-					alert('Nomor rekening berhasil disalin!');
+					const toast = document.getElementById('copy-toast');
+
+					// Munculkan toast
+					toast.classList.remove('translate-y-20', 'opacity-0');
+
+					// Sembunyikan kembali setelah 3 detik
+					setTimeout(() => {
+						toast.classList.add('translate-y-20', 'opacity-0');
+					}, 3000);
 				});
 			}
 		</script>
