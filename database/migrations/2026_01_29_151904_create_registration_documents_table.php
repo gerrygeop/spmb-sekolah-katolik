@@ -17,6 +17,8 @@ return new class extends Migration
             $table->foreignId('document_id')->constrained('documents')->onDelete('cascade');
             $table->string('file_path')->nullable();
             $table->timestamps();
+
+            $table->unique(['registration_id', 'document_id']);
         });
     }
 

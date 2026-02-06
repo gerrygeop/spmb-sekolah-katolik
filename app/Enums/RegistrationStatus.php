@@ -66,17 +66,4 @@ enum RegistrationStatus: string implements HasLabel, HasColor
             self::TIDAK_LULUS => 'bg-red-100 text-red-800 border-red-300',
         };
     }
-
-    public function statusIcon(): string
-    {
-        return match ($this) {
-            self::VERIFIKASI => '📝',
-            self::PERBAIKAN => '⚠️',
-            self::PEMBAYARAN_TERTUNDA => '💳',
-            self::TERVERIFIKASI => '✅',
-            self::LULUS => '🎉',
-            self::CADANGAN => '⏳',
-            self::TIDAK_LULUS => '❌',
-        };
-    }
 }

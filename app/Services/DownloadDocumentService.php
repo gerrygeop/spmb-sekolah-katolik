@@ -13,7 +13,7 @@ class DownloadDocumentService
     public function downloadAllDocuments(Registration $registration): BinaryFileResponse
     {
         // Eager load relationships to prevent N+1 queries
-        $registration->load(['documents', 'student']);
+        $registration->load(['documents.document', 'student']);
 
         // Validate that there are documents to download
         if ($registration->documents->isEmpty()) {
@@ -56,7 +56,7 @@ class DownloadDocumentService
             $extension = pathinfo($filePath, PATHINFO_EXTENSION);
 
             // Create sanitized filename for the document
-            $documentName = $this->sanitizeFilename($document->type ?? 'document');
+            $documentName = $this->sanitizeFilename($document->document?->name ?? 'document');
             $documentFilename = "{$documentName}.{$extension}";
 
             // Handle duplicate filenames by appending counter

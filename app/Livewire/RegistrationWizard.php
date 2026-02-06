@@ -61,23 +61,17 @@ class RegistrationWizard extends Component
 
     public function mount($code = null)
     {
-        $this->documents = \App\Models\Document::all();
-        $batch = \App\Models\RegistrationBatch::query()
-            ->active()
-            ->first();
-
+        $batch = \App\Models\RegistrationBatch::query()->active()->first();
         $this->batch = $batch;
         $this->batchId = $batch?->id;
 
-        // Jika bukan mode edit dan tidak ada batch aktif, tolak akses
-        if (!$this->isEdit && !$this->batchId) {
-            return redirect()->back();
-        }
+        $this->documents = \App\Models\Document::all();
 
         if ($code) {
             $registration = Registration::with(['student', 'parent', 'payment', 'documents'])->where('registration_code', $code)->firstOrFail();
 
             abort_if($registration->status !== RegistrationStatus::PERBAIKAN, 403);
+            $this->isEdit = true;
 
             foreach ($registration->documents as $doc) {
                 $this->existingDocuments[$doc->document_id] = $doc->file_path;
@@ -91,7 +85,6 @@ class RegistrationWizard extends Component
                 ->toArray();
 
             $this->registrationCode = $code;
-            $this->isEdit = true;
             $this->school_level = $registration->school_level->value;
 
             // Student
@@ -135,7 +128,13 @@ class RegistrationWizard extends Component
         } elseif ($step == 2) {
             $this->validate([
                 'full_name' => 'required|string|max:255',
-                'email' => 'required|email|max:255',
+                'email' => [
+                    'required',
+                    'email',
+                    'max:255',
+                    Rule::unique('student_profiles', 'email')
+                        ->ignore($this->isEdit ? $this->studentProfileId : null),
+                ],
                 'phone_number' => 'required|string|max:20',
                 'gender' => 'required|in:Laki-laki,Perempuan',
                 'place_of_birth' => 'required|string|max:255',
@@ -146,9 +145,7 @@ class RegistrationWizard extends Component
                     'string',
                     'max:10',
                     Rule::unique('student_profiles', 'nisn')
-                        ->ignore(
-                            $this->isEdit ? $this->studentProfileId : null
-                        ),
+                        ->ignore($this->isEdit ? $this->studentProfileId : null),
                 ],
                 'previous_school' => 'nullable|string|max:255',
             ]);
