@@ -6,8 +6,7 @@ use App\Enums\RegistrationStatus;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\Registration;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use App\Services\RegistrationService;
 use Illuminate\Validation\Rule;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 
@@ -197,7 +196,7 @@ class RegistrationWizard extends Component
         $this->currentStep--;
     }
 
-    public function submit()
+    public function submit(RegistrationService $registrationService)
     {
         if ($this->isSubmitting) return;
 
@@ -216,108 +215,40 @@ class RegistrationWizard extends Component
         $this->validateStep($this->currentStep);
 
         try {
-            $registration = DB::transaction(function () {
-                if ($this->isEdit) {
-                    $registration = Registration::where('registration_code', $this->registrationCode)
-                        ->lockForUpdate()
-                        ->firstOrFail();
+            $studentData = [
+                'full_name' => $this->full_name,
+                'email' => $this->email,
+                'phone_number' => $this->phone_number,
+                'gender' => $this->gender,
+                'place_of_birth' => $this->place_of_birth,
+                'date_of_birth' => $this->date_of_birth,
+                'address' => $this->address,
+                'nisn' => $this->nisn,
+                'previous_school' => $this->previous_school,
+            ];
 
-                    $registration->changeStatus(
-                        RegistrationStatus::VERIFIKASI,
-                        'Pendaftar mengedit data'
-                    );
+            $parentData = [
+                'father_name' => $this->father_name,
+                'father_phone' => $this->father_phone,
+                'father_occupation' => $this->father_occupation,
+                'mother_name' => $this->mother_name,
+                'mother_phone' => $this->mother_phone,
+                'mother_occupation' => $this->mother_occupation,
+                'guardian_name' => $this->guardian_name,
+                'guardian_phone' => $this->guardian_phone,
+                'guardian_occupation' => $this->guardian_occupation,
+            ];
 
-                    $registration->student()->update([
-                        'full_name' => $this->full_name,
-                        'email' => $this->email,
-                        'phone_number' => $this->phone_number,
-                        'gender' => $this->gender,
-                        'place_of_birth' => $this->place_of_birth,
-                        'date_of_birth' => $this->date_of_birth,
-                        'address' => $this->address,
-                        'nisn' => $this->nisn,
-                        'previous_school' => $this->previous_school,
-                    ]);
-
-                    $registration->parent()->update([
-                        'father_name' => $this->father_name,
-                        'father_phone' => $this->father_phone,
-                        'father_occupation' => $this->father_occupation,
-                        'mother_name' => $this->mother_name,
-                        'mother_phone' => $this->mother_phone,
-                        'mother_occupation' => $this->mother_occupation,
-                        'guardian_name' => $this->guardian_name,
-                        'guardian_phone' => $this->guardian_phone,
-                        'guardian_occupation' => $this->guardian_occupation,
-                    ]);
-                } else {
-                    // Create New
-                    $registration = Registration::createNew(
-                        $this->batch,
-                        $this->school_level
-                    );
-
-                    $registration->student()->create([
-                        'full_name' => $this->full_name,
-                        'email' => $this->email,
-                        'phone_number' => $this->phone_number,
-                        'gender' => $this->gender,
-                        'place_of_birth' => $this->place_of_birth,
-                        'date_of_birth' => $this->date_of_birth,
-                        'address' => $this->address,
-                        'nisn' => $this->nisn,
-                        'previous_school' => $this->previous_school,
-                    ]);
-
-                    $registration->parent()->create([
-                        'father_name' => $this->father_name,
-                        'father_phone' => $this->father_phone,
-                        'father_occupation' => $this->father_occupation,
-                        'mother_name' => $this->mother_name,
-                        'mother_phone' => $this->mother_phone,
-                        'mother_occupation' => $this->mother_occupation,
-                        'guardian_name' => $this->guardian_name,
-                        'guardian_phone' => $this->guardian_phone,
-                        'guardian_occupation' => $this->guardian_occupation,
-                    ]);
-                }
-
-                // Save Documents
-                foreach ($this->uploadedDocuments as $documentId => $file) {
-                    if (!$file) continue;
-
-                    $old = $registration->documents()
-                        ->where('document_id', $documentId)
-                        ->first();
-
-                    if ($old && $old->file_path) {
-                        Storage::disk('public')->delete($old->file_path);
-                    }
-
-                    $path = $file->store('documents', 'public');
-                    $registration->documents()->updateOrCreate(
-                        ['document_id' => $documentId],
-                        ['file_path' => $path]
-                    );
-                }
-
-                // Bukti pembayaran
-                if ($this->payment_proof && $this->isEdit) {
-                    $path = $this->payment_proof->store('payment-proofs', 'public');
-                    $oldPath = $registration->payment?->proof_file;
-
-                    $registration->payment()->updateOrCreate(
-                        ['registration_id' => $registration->id],
-                        ['proof_file' => $path]
-                    );
-
-                    if ($oldPath) {
-                        Storage::disk('public')->delete($oldPath);
-                    }
-                }
-
-                return $registration;
-            });
+            $registration = $registrationService->createOrUpdate(
+                $this->isEdit,
+                $this->registrationCode,
+                $this->batch,
+                $this->school_level,
+                $studentData,
+                $parentData,
+                $this->uploadedDocuments,
+                $this->payment_proof
+            );
 
             return redirect()
                 ->route('status.show', ['code' => $registration->registration_code])

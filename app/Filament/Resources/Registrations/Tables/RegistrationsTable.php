@@ -102,6 +102,7 @@ class RegistrationsTable
                 ViewAction::make(),
                 EditAction::make(),
             ])
+            ->defaultSort('created_at', 'desc')
             ->toolbarActions([
                 ExportBulkAction::make()
                     ->exporter(RegistrationExporter::class)
