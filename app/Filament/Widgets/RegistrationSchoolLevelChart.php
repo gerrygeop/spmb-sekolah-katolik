@@ -3,10 +3,10 @@
 namespace App\Filament\Widgets;
 
 use App\Enums\SchoolLevel;
+use App\Enums\UserRole;
 use App\Models\Registration;
 use Filament\Widgets\ChartWidget;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
-use Illuminate\Support\Facades\DB;
 
 class RegistrationSchoolLevelChart extends ChartWidget
 {
@@ -17,11 +17,16 @@ class RegistrationSchoolLevelChart extends ChartWidget
 
     protected function getData(): array
     {
-        $batchId = $this->tableFilters['batch_id'] ?? null;
+        $batchId = $this->pageFilters['batch_id'] ?? null;
         $query = Registration::query();
 
         if ($batchId) {
             $query->where('registration_batch_id', $batchId);
+        }
+
+        $schoolLevel = $this->getRoleSchoolLevel();
+        if ($schoolLevel) {
+            $query->where('school_level', $schoolLevel->value);
         }
 
         $data = $query->selectRaw('school_level, count(*) as count')
@@ -43,5 +48,31 @@ class RegistrationSchoolLevelChart extends ChartWidget
     protected function getType(): string
     {
         return 'pie';
+    }
+
+    public static function canView(): bool
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return false;
+        }
+
+        return !in_array($user->role, [UserRole::ADMIN_SMP, UserRole::ADMIN_SMA], true);
+    }
+
+    private function getRoleSchoolLevel(): ?SchoolLevel
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return null;
+        }
+
+        return match ($user->role) {
+            UserRole::ADMIN_SMP => SchoolLevel::SMP,
+            UserRole::ADMIN_SMA => SchoolLevel::SMA,
+            default => null,
+        };
     }
 }

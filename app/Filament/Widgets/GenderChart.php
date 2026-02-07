@@ -2,6 +2,8 @@
 
 namespace App\Filament\Widgets;
 
+use App\Enums\SchoolLevel;
+use App\Enums\UserRole;
 use App\Models\StudentProfile;
 use Filament\Widgets\ChartWidget;
 use Filament\Widgets\Concerns\InteractsWithPageFilters;
@@ -16,11 +18,13 @@ class GenderChart extends ChartWidget
 
     protected function getData(): array
     {
-        $batchId = $this->tableFilters['batch_id'] ?? null;
+        $batchId = $this->pageFilters['batch_id'] ?? null;
+        $schoolLevel = $this->getRoleSchoolLevel();
 
         $data = StudentProfile::query()
             ->join('registrations', 'student_profiles.registration_id', '=', 'registrations.id')
             ->when($batchId, fn($query) => $query->where('registrations.registration_batch_id', $batchId))
+            ->when($schoolLevel, fn($query) => $query->where('registrations.school_level', $schoolLevel->value))
             ->select('student_profiles.gender', DB::raw('count(*) as count'))
             ->groupBy('student_profiles.gender')
             ->pluck('count', 'gender')
@@ -48,5 +52,20 @@ class GenderChart extends ChartWidget
     protected function getType(): string
     {
         return 'doughnut';
+    }
+
+    private function getRoleSchoolLevel(): ?SchoolLevel
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return null;
+        }
+
+        return match ($user->role) {
+            UserRole::ADMIN_SMP => SchoolLevel::SMP,
+            UserRole::ADMIN_SMA => SchoolLevel::SMA,
+            default => null,
+        };
     }
 }
