@@ -58,7 +58,14 @@
 					</nav>
 				</div>
 
-				<form wire:submit.prevent="submit" class="p-6 sm:p-10">
+				<form
+					wire:submit.prevent="submit"
+					x-data="{ uploading: false }"
+					x-on:livewire-upload-start="uploading = true"
+					x-on:livewire-upload-finish="uploading = false"
+					x-on:livewire-upload-error="uploading = false"
+					x-on:livewire-upload-cancel="uploading = false"
+					class="p-6 sm:p-10">
 					{{-- Step 1: School Level --}}
 					@if ($currentStep == 1)
 						<div class="animate-fade-in-up">
@@ -588,8 +595,14 @@
 						@endif
 
 						@if ($currentStep < $totalSteps)
-							<button type="button" wire:click="nextStep" wire:loading.attr="disabled"
-								class="inline-flex items-center justify-center gap-x-1 px-6 py-3 border border-transparent text-sm font-bold rounded-full shadow-lg text-white bg-indigo-600 hover:bg-indigo-700 hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
+                        <button
+                            type="button"
+                            wire:click="nextStep"
+                            wire:loading.attr="disabled"
+                            wire:target="nextStep,uploadedDocuments,uploadedDocuments.*,payment_proof"
+							:disabled="uploading"
+							x-bind:class="uploading ? 'pointer-events-none opacity-50' : ''"
+                            class="inline-flex items-center justify-center gap-x-1 px-6 py-3 border border-transparent text-sm font-bold rounded-full shadow-lg text-white bg-indigo-600 hover:bg-indigo-700 hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
 
 								<span wire:loading.remove wire:target="nextStep" class="flex items-center gap-1">
 									Selanjutnya
@@ -612,8 +625,13 @@
 								</span>
 							</button>
 						@else
-							<button type="submit" wire:loading.attr="disabled" wire:target="submit"
-								class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-sm font-bold rounded-full text-white bg-green-600 hover:bg-green-700 hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-70 disabled:cursor-not-allowed">
+                        <button
+                            type="submit"
+                            wire:loading.attr="disabled"
+                            wire:target="submit,uploadedDocuments,uploadedDocuments.*,payment_proof"
+							:disabled="uploading"
+							x-bind:class="uploading ? 'pointer-events-none opacity-70' : ''"
+                            class="inline-flex items-center justify-center px-6 py-3 border border-transparent text-sm font-bold rounded-full text-white bg-green-600 hover:bg-green-700 hover:scale-105 transition-all focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-70 disabled:cursor-not-allowed">
 
 								<span wire:loading.remove wire:target="submit" class="flex items-center justify-center gap-2">
 									Kirim Pendaftaran
