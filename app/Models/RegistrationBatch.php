@@ -25,6 +25,8 @@ class RegistrationBatch extends Model
     protected $casts = [
         'timeline' => 'array',
         'is_active' => 'boolean',
+        'registration_start' => 'datetime',
+        'registration_end' => 'datetime',
     ];
 
     protected static function booted()
@@ -50,7 +52,7 @@ class RegistrationBatch extends Model
         return $this->hasMany(Registration::class);
     }
 
-    public function selectionSchedules(): HasOne
+    public function selectionSchedule(): HasOne
     {
         return $this->hasOne(SelectionSchedule::class);
     }

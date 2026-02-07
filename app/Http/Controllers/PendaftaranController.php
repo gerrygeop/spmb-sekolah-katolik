@@ -20,7 +20,7 @@ class PendaftaranController extends Controller
             'documents.document',
             'payment',
             'batch',
-            'batch.selectionSchedules'
+            'batch.selectionSchedule'
         ])
             ->where('registration_code', $code)
             ->firstOrFail();

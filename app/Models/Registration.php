@@ -58,7 +58,7 @@ class Registration extends Model
 
     public function getSelectionScheduleAttribute()
     {
-        return $this->batch?->selectionSchedules()->first();
+        return $this->batch?->selectionSchedule;
     }
 
     public function changeStatus(RegistrationStatus $toStatus, ?string $description = null, ?string $notes = null): void
@@ -71,7 +71,7 @@ class Registration extends Model
         $this->save();
 
         $this->logs()->create([
-            'user_id' => auth()->check() && auth()->user()->role === UserRole::ADMIN ? auth()->id() : null,
+            'user_id' => auth()->check() && auth()->user()->hasAdminAccess() ? auth()->id() : null,
             'from_status' => $fromStatus,
             'to_status' => $toStatus,
             'description' => $description

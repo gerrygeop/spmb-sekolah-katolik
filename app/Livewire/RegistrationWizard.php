@@ -137,7 +137,7 @@ class RegistrationWizard extends Component
                 'phone_number' => 'required|string|max:20',
                 'gender' => 'required|in:Laki-laki,Perempuan',
                 'place_of_birth' => 'required|string|max:255',
-                'date_of_birth' => 'required|date',
+                'date_of_birth' => 'required|date|before_or_equal:today',
                 'address' => 'required|string',
                 'nisn' => [
                     'required',
@@ -211,8 +211,8 @@ class RegistrationWizard extends Component
             $this->batchId = $currentBatch->id;
         }
 
+        $this->validateAllSteps();
         $this->isSubmitting = true;
-        $this->validateStep($this->currentStep);
 
         try {
             $studentData = [
@@ -266,6 +266,13 @@ class RegistrationWizard extends Component
                 ->with('submit', 'Terjadi kesalahan saat memproses pendaftaran. Silakan coba lagi.');
         } finally {
             $this->isSubmitting = false;
+        }
+    }
+
+    private function validateAllSteps(): void
+    {
+        foreach ([1, 2, 3, 4] as $step) {
+            $this->validateStep($step);
         }
     }
 
