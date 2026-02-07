@@ -91,34 +91,34 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Generate Registrations
-        $faker = \Faker\Factory::create();
-        for ($i = 0; $i < 50; $i++) {
-            // Random created_at between start and end of batch
-            $createdAt = $faker->dateTimeBetween($batch->registration_start, $batch->registration_end);
+        // $faker = \Faker\Factory::create();
+        // for ($i = 0; $i < 50; $i++) {
+        //     // Random created_at between start and end of batch
+        //     $createdAt = $faker->dateTimeBetween($batch->registration_start, $batch->registration_end);
 
-            $registration = \App\Models\Registration::factory()->create([
-                'registration_batch_id' => $batch->id,
-                'created_at' => $createdAt,
-                'updated_at' => $createdAt,
-            ]);
+        //     $registration = \App\Models\Registration::factory()->create([
+        //         'registration_batch_id' => $batch->id,
+        //         'created_at' => $createdAt,
+        //         'updated_at' => $createdAt,
+        //     ]);
 
-            \App\Models\StudentProfile::factory()->create([
-                'registration_id' => $registration->id,
-            ]);
+        //     \App\Models\StudentProfile::factory()->create([
+        //         'registration_id' => $registration->id,
+        //     ]);
 
-            \App\Models\ParentProfile::factory()->create([
-                'registration_id' => $registration->id,
-            ]);
+        //     \App\Models\ParentProfile::factory()->create([
+        //         'registration_id' => $registration->id,
+        //     ]);
 
-            // Payment logic
-            // If status is NOT PEMBAYARAN_TERTUNDA, payment is required with proof
-            if ($registration->status !== \App\Enums\RegistrationStatus::PEMBAYARAN_TERTUNDA) {
-                \App\Models\Payment::factory()->create([
-                    'registration_id' => $registration->id,
-                    'created_at' => Carbon::parse($createdAt)->addDays(rand(0, 3)), // Payment made shortly after registration
-                    'updated_at' => Carbon::parse($createdAt)->addDays(rand(0, 3)),
-                ]);
-            }
-        }
+        //     // Payment logic
+        //     // If status is NOT PEMBAYARAN_TERTUNDA, payment is required with proof
+        //     if ($registration->status !== \App\Enums\RegistrationStatus::PEMBAYARAN_TERTUNDA) {
+        //         \App\Models\Payment::factory()->create([
+        //             'registration_id' => $registration->id,
+        //             'created_at' => Carbon::parse($createdAt)->addDays(rand(0, 3)), // Payment made shortly after registration
+        //             'updated_at' => Carbon::parse($createdAt)->addDays(rand(0, 3)),
+        //         ]);
+        //     }
+        // }
     }
 }
