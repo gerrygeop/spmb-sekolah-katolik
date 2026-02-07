@@ -80,7 +80,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Create Selection Schedules based on the timeline manually or systematically
-        $batch->selectionSchedules()->createMany([
+        $batch->selectionSchedule()->createMany([
             [
                 'title' => 'Tes Tertulis Gelombang 1',
                 'scheduled_at' => $now->copy()->addMonths(3)->addDays(1)->setHour(8)->setMinute(0),
