@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Registration;
+use App\Enums\RegistrationStatus;
 use Illuminate\Http\Request;
 
 class PendaftaranController extends Controller
@@ -26,6 +27,25 @@ class PendaftaranController extends Controller
             ->firstOrFail();
 
         return view('status.show', compact('registration'));
+    }
+
+    public function examCard($code)
+    {
+        $registration = Registration::with([
+            'student',
+            'batch',
+            'batch.selectionSchedules'
+        ])
+            ->where('registration_code', $code)
+            ->firstOrFail();
+
+        if ($registration->status !== RegistrationStatus::TERVERIFIKASI) {
+            abort(403);
+        }
+
+        $schedule = $registration->selection_schedule;
+
+        return view('status.exam-card', compact('registration', 'schedule'));
     }
 
     public function check(Request $request)

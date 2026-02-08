@@ -20,6 +20,21 @@
 			{{-- Header Card --}}
 			<x-registration-status-card :registration="$registration" />
 
+			@if ($registration->status === \App\Enums\RegistrationStatus::TERVERIFIKASI)
+				<div class="flex justify-end">
+					<a href="{{ route('status.exam-card', ['code' => $registration->registration_code]) }}" target="_blank"
+						rel="noopener"
+						class="inline-flex items-center gap-3 px-6 py-3 bg-slate-900 text-white text-xs font-black uppercase tracking-widest rounded-xl hover:bg-slate-800 transition-colors shadow">
+						Cetak Kartu Ujian
+						<svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24"
+							stroke="currentColor">
+							<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+								d="M6 9V4h12v5m0 0H6m12 0a2 2 0 012 2v6a2 2 0 01-2 2h-2m-8 0H6a2 2 0 01-2-2v-6a2 2 0 012-2m4 8h4m-4 0v4h4v-4" />
+						</svg>
+					</a>
+				</div>
+			@endif
+
 			{{-- Student & Parent Data --}}
 			<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 				<x-info-card title="Data Calon Siswa" icon="👤" class="lg:col-span-2">
