@@ -7,6 +7,6 @@
 
 	<x-partials.timeline :timeline="$timeline" :batch="$batch" />
 
-	<x-partials.gallery />
+	<x-partials.gallery :galleries="$galleries" />
 
 </x-layouts.landing>
