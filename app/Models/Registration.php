@@ -58,7 +58,23 @@ class Registration extends Model
 
     public function getSelectionScheduleAttribute()
     {
-        return $this->batch?->selectionSchedule;
+        $batch = $this->batch;
+        if (!$batch) return null;
+
+        $level = $this->school_level;
+        $levelValue = $level?->value ?? $level;
+
+        if ($levelValue) {
+            $schedule = $batch->selectionSchedules()
+                ->where('school_level', $levelValue)
+                ->first();
+
+            if ($schedule) return $schedule;
+        }
+
+        return $batch->selectionSchedules()
+            ->whereNull('school_level')
+            ->first();
     }
 
     public function changeStatus(RegistrationStatus $toStatus, ?string $description = null, ?string $notes = null): void

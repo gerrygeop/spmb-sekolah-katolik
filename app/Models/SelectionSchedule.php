@@ -11,6 +11,7 @@ class SelectionSchedule extends Model
 {
     protected $fillable = [
         'registration_batch_id',
+        'school_level',
         'title',
         'scheduled_at',
         'end_time',
@@ -21,6 +22,7 @@ class SelectionSchedule extends Model
     protected $casts = [
         'scheduled_at' => 'datetime',
         'end_time' => 'datetime',
+        'school_level' => \App\Enums\SchoolLevel::class,
     ];
 
     public function batch(): BelongsTo

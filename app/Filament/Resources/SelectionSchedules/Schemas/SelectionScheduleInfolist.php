@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SelectionSchedules\Schemas;
 
+use App\Enums\SchoolLevel;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -20,6 +21,14 @@ class SelectionScheduleInfolist
                         TextEntry::make('batch.name')
                             ->label('Periode Pendaftaran')
                             ->badge(),
+
+                        TextEntry::make('school_level')
+                            ->label('Jenjang')
+                            ->formatStateUsing(function ($state) {
+                                $level = $state instanceof SchoolLevel ? $state : SchoolLevel::tryFrom((string) $state);
+
+                                return $level?->getLabel() ?? (string) $state;
+                            }),
 
                         TextEntry::make('title')
                             ->label('Kegiatan'),

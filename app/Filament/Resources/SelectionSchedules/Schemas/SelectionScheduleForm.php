@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SelectionSchedules\Schemas;
 
+use App\Enums\SchoolLevel;
 use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -27,6 +28,17 @@ class SelectionScheduleForm
                                 name: 'batch',
                                 titleAttribute: 'name',
                                 modifyQueryUsing: fn(Builder $query) => $query->where('is_active', true)
+                            )
+                            ->required(),
+
+                        Select::make('school_level')
+                            ->label('Jenjang Sekolah')
+                            ->options(
+                                collect(SchoolLevel::cases())
+                                    ->mapWithKeys(fn(SchoolLevel $level) => [
+                                        $level->value => $level->getLabel(),
+                                    ])
+                                    ->all()
                             )
                             ->required(),
 

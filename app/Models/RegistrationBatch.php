@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class RegistrationBatch extends Model
@@ -52,8 +51,8 @@ class RegistrationBatch extends Model
         return $this->hasMany(Registration::class);
     }
 
-    public function selectionSchedule(): HasOne
+    public function selectionSchedules(): HasMany
     {
-        return $this->hasOne(SelectionSchedule::class);
+        return $this->hasMany(SelectionSchedule::class);
     }
 }

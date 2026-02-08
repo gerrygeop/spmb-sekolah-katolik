@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\SelectionSchedules\Tables;
 
+use App\Enums\SchoolLevel;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -20,6 +21,16 @@ class SelectionSchedulesTable
                     ->label('Periode Pendaftaran')
                     ->badge()
                     ->color('info')
+                    ->sortable(),
+
+                TextColumn::make('school_level')
+                    ->label('Jenjang')
+                    ->badge()
+                    ->formatStateUsing(function ($state) {
+                        $level = $state instanceof SchoolLevel ? $state : SchoolLevel::tryFrom((string) $state);
+
+                        return $level?->getLabel() ?? (string) $state;
+                    })
                     ->sortable(),
 
                 TextColumn::make('title')
@@ -52,7 +63,16 @@ class SelectionSchedulesTable
             ->filters([
                 SelectFilter::make('registration_batch_id')
                     ->relationship('batch', 'name')
-                    ->label('Filter Periode')
+                    ->label('Filter Periode'),
+                SelectFilter::make('school_level')
+                    ->label('Filter Jenjang')
+                    ->options(
+                        collect(SchoolLevel::cases())
+                            ->mapWithKeys(fn(SchoolLevel $level) => [
+                                $level->value => $level->getLabel(),
+                            ])
+                            ->all()
+                    )
             ])
             ->recordActions([
                 ViewAction::make(),

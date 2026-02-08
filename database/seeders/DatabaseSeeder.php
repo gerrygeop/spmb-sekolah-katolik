@@ -80,11 +80,20 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Create Selection Schedules based on the timeline manually or systematically
-        $batch->selectionSchedule()->createMany([
+        $batch->selectionSchedules()->createMany([
             [
+                'school_level' => \App\Enums\SchoolLevel::SMP->value,
                 'title' => 'Tes Tertulis Gelombang 1',
                 'scheduled_at' => $now->copy()->addMonths(3)->addDays(1)->setHour(8)->setMinute(0),
                 'end_time' => $now->copy()->addMonths(3)->addDays(1)->setHour(12)->setMinute(0),
+                'location' => 'Aula Utama Sekolah Katolik',
+                'requirements' => 'Membawa alat tulis dan kartu ujian',
+            ],
+            [
+                'school_level' => \App\Enums\SchoolLevel::SMA->value,
+                'title' => 'Tes Tertulis Gelombang 1',
+                'scheduled_at' => $now->copy()->addMonths(3)->addDays(2)->setHour(8)->setMinute(0),
+                'end_time' => $now->copy()->addMonths(3)->addDays(2)->setHour(12)->setMinute(0),
                 'location' => 'Aula Utama Sekolah Katolik',
                 'requirements' => 'Membawa alat tulis dan kartu ujian',
             ],
