@@ -1,11 +1,7 @@
 <x-layouts.print :title="'Kartu Ujian - ' . $registration->registration_code">
 	<div class="min-h-screen py-10 px-4">
-		<div class="max-w-3xl mx-auto space-y-4">
+		<div class="max-w-lg mx-auto space-y-4">
 			<div class="no-print flex items-center justify-end gap-3">
-				<a href="{{ route('status.show', ['code' => $registration->registration_code]) }}"
-					class="px-4 py-2 text-xs font-black uppercase tracking-widest rounded-xl border border-slate-300 bg-white hover:bg-slate-50 transition-colors">
-					Kembali
-				</a>
 				<button onclick="window.print()"
 					class="px-5 py-2 text-xs font-black uppercase tracking-widest rounded-xl bg-slate-900 text-white hover:bg-slate-800 transition-colors shadow">
 					Cetak
@@ -27,8 +23,8 @@
 					</div>
 				</div>
 
-				<div class="p-6 space-y-6">
-					<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+				<div>
+					<div class="p-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
 						<div>
 							<p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Nomor Pendaftaran</p>
 							<p class="text-base font-bold text-slate-900">
@@ -61,7 +57,7 @@
 						</div>
 					</div>
 
-					<div class="border-t border-slate-800 pt-5">
+					<div class="p-6 border-t border-slate-800">
 						<h2 class="text-sm font-black text-slate-900 uppercase tracking-widest my-3">Jadwal Tes Seleksi</h2>
 
 						@if ($schedule)
@@ -96,15 +92,15 @@
 						@endif
 					</div>
 
-					<div class="pt-5">
-						<ul class="text-xs text-slate-700 space-y-1">
+					<div class="p-6">
+						<ul class="text-xs text-slate-600 space-y-1">
 							<li>Hadir 15 menit sebelum tes dimulai.</li>
 							<li>Bawa kartu ujian ini dan identitas diri yang sah.</li>
 							<li>Gunakan pakaian rapi dan sopan sesuai ketentuan sekolah.</li>
 						</ul>
 					</div>
 
-					<div class="flex items-center justify-between border-t border-slate-200 pt-4">
+					<div class="flex items-center justify-between border-t border-slate-500 px-6 py-3">
 						<div class="text-[10px] text-slate-600 uppercase tracking-widest">
 							Dicetak: {{ now()->translatedFormat('d F Y H:i') }} WIB
 						</div>

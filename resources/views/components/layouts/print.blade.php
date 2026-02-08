@@ -13,9 +13,21 @@
 	<style>
 		body {
 			font-family: 'Plus Jakarta Sans', sans-serif;
+			-webkit-print-color-adjust: exact !important;
+			print-color-adjust: exact !important;
 		}
 
 		@media print {
+			@page {
+				size: auto;
+				margin: 0;
+			}
+
+			body {
+				margin: 0;
+				background-color: white !important;
+			}
+
 			.no-print {
 				display: none !important;
 			}
